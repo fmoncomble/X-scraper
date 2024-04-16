@@ -3,16 +3,16 @@ An extension for extracting and downloading tweets for text mining.
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *𝕏-Scraper* (Version 0.1) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-Scraper/
+Moncomble, F. (2024). *𝕏-Scraper* (Version 0.1) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
 
 
 ## Installation
 ### Firefox (recommended: automatic updates)
-[![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-Scraper/releases/latest/download/x-scraper.xpi)  
+[![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)  
 Remember to pin the add-on to the toolbar
 
 ### Chrome/Edge
-- [Download .zip archive](https://github.com/fmoncomble/press-corpus-scraper/releases/latest/download/x-scraper.zip)
+- [Download .zip archive](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.zip)
 - Unzip the archive
 - Open the extensions manager: `chrome://extensions` or `edge://extensions`
   - Activate "developer mode"
