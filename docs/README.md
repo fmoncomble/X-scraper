@@ -9,7 +9,9 @@ Moncomble, F. (2024). *𝕏-Scraper* (Version 0.1) [JavaScript]. Arras, France: 
 ## Installation
 ### Firefox (recommended: automatic updates)
 [![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)  
-Remember to pin the add-on to the toolbar
+Remember:
+- to pin the add-on to the toolbar
+- to "always allow on twitter.com" by right-clicking the icon
 
 ### Chrome/Edge
 - [Download .zip archive](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.zip)
