@@ -3,7 +3,7 @@ An extension for extracting and downloading tweets for text mining.
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *𝕏-Scraper* (Version 0.1) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2024). *𝕏-Scraper* (Version 0.2) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
 
 
 ## Installation
