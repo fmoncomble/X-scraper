@@ -23,10 +23,15 @@ Remember:
 - Pin the add-on to the toolbar
  
 ## Instructions for use
-- Navigate to [X/Twitter](https://x.com/) and perform a search (simple or advanced)
+- Navigate to [𝕏/Twitter](https://x.com/) and perform a search (simple or advanced)
+    - It is advised to create a specific account for the purpose of scraping content
 - Click the add-on's icon in the toolbar
-- The results page needs to be reloaded for the add-on to work
+- Click the `Reload` button for the add-on to work
 - (Optional) Enter the maximum number of tweets to scrape
+- Choose desired output file format:
+    - `XML` for an XML-TEI file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/) with the `XML-TEI Zero + CSV` module
+    - `TXT` for a plain text file
+    - `JSON`
 - Click `Start scraping`
 - You can abort at any time
-- Click `Download` to download an XML-TEI file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/) with the `XML-TEI Zero + CSV` module
+- Click `Download` to collect the output or `Reload` to start again 

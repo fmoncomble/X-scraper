@@ -23,6 +23,14 @@
                     <label for="max-tweets">Max tweets:</label>
                     <input type="number" id="max-tweets" name="max-tweets" />
                 </div>
+                <div id="format-container">
+                    <label for="file-format">Choose file format:</label>
+                    <select id="file-format" name="file-format">
+                        <option value="xml">XML/TEI</option>
+                        <option value="txt">TXT</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
                 <button id="scrapeButton" style="display: none">
                     Start scraping
                 </button>

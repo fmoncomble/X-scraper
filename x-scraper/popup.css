@@ -1,7 +1,7 @@
 html {
-	border: none;
-	border-radius: 10px;
-	width: 272px;
+    border: none;
+    border-radius: 10px;
+    width: 272px;
 }
 
 body {
@@ -10,17 +10,18 @@ body {
     font-family: system-ui, sans-serif;
     font-size: small;
     width: 236px;
-    height: 250px;
+    height: 350px;
     padding: 10px;
 }
 
-button {
+button,
+select {
     border: 1px solid;
-    border-color: #E0E0E0;
+    border-color: #e0e0e0;
     border-radius: 4px;
     height: 32px;
     width: auto;
-    color: #4285F4;
+    color: #4285f4;
     background-color: white;
     text-align: center;
     font-weight: 500;
@@ -28,14 +29,34 @@ button {
     margin: 1em;
 }
 
-button:hover {
-	border-color: #BBDEFB;
-	background-color: rgba(33, 150, 243, .04);
+select:focus-visible,
+button:focus-visible {
+    outline: none;
+}
+
+button:hover,
+select:hover {
+    border-color: #bbdefb;
+    background-color: rgba(33, 150, 243, 0.04);
     cursor: pointer;
 }
 
 button:active {
-	border: 2px solid;
+    border: 2px solid;
+}
+
+input {
+    border: none;
+    background-color: #f2f2f2;
+    color: #041f4a;
+    margin: 1em;
+    border-radius: 4px;
+    height: 32px;
+    width: 8em;
+}
+
+input:focus-visible {
+    outline: solid 1px #041f4a;
 }
 
 #stopButton {
@@ -57,5 +78,3 @@ button:active {
     font-weight: bold;
     color: red;
 }
-
-
