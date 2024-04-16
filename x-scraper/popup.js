@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const scrapeContainer = document.getElementById('scrape-container');
     const inputContainer = document.getElementById('input-container');
     const formatContainer = document.getElementById('format-container');
-
     const scrapeButton = document.getElementById('scrapeButton');
     const stopButton = document.getElementById('stopButton');
     const abortMsg = document.getElementById('abort-msg');
@@ -23,9 +22,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    let maxTweets;
+    const maxTweetInput = document.getElementById('max-tweets');
+
     reloadButton.addEventListener('click', function () {
         chrome.tabs.reload();
         reloadDiv.style.display = 'none';
+        maxTweetInput.value = '';
         stopButton.style.display = 'none';
         abortMsg.style.display = 'none';
         processContainer.textContent = '';
@@ -37,8 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         scrapeButton.style.display = 'inline-block';
     });
 
-    let maxTweets;
-    const maxTweetInput = document.getElementById('max-tweets');
     maxTweetInput.addEventListener('change', function () {
         maxTweets = maxTweetInput.value;
         console.log('maxTweets = ', maxTweets);
@@ -47,13 +48,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let fileFormat = 'xml';
     fileFormatSelect.addEventListener('change', function () {
         fileFormat = fileFormatSelect.value;
+        downloadButton.textContent = `Download ${fileFormat.toUpperCase()}`;
         console.log('File format = ', fileFormat);
+        console.log('Download text = ', downloadButton.textContent);
     });
 
     scrapeButton.addEventListener('click', function () {
         scrapeButton.style.display = 'none';
         stopButton.style.display = 'inline-block';
-        processContainer.textContent = 'Scraping...';
+        updateTweetCount();
         chrome.tabs.query(
             { active: true, currentWindow: true },
             function (tabs) {
@@ -70,8 +73,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             processContainer.textContent =
                                 response.data + ' tweet(s) scraped';
                             stopButton.style.display = 'none';
+                            inputContainer.style.display = 'none';
                             formatContainer.style.display = 'none';
-                            reloadDiv.style.display = 'inline-block';
+                            reloadDiv.style.display = 'block';
                             downloadButton.style.display = 'inline-block';
                         } else {
                             console.error('Error: ', response.error);
@@ -124,4 +128,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         );
     });
+
+    // Function to update the number of scraped tweets
+    let tweetCount;
+    function updateTweetCount() {
+        console.log('updateTweetCount function invoked');
+        let port;
+        chrome.runtime.onConnect.addListener(connect);
+        function connect(p) {
+            port = p;
+            console.assert(port.name === 'contentjs');
+            port.onMessage.addListener((msg) => respond(msg));
+            function respond(msg) {
+                if (msg) {
+                    console.log('Message from content: ', msg);
+                    console.log('Updating range');
+                    tweetCount = msg.tweetCount;
+                    processContainer.textContent = `Scraping ${tweetCount} tweet(s)...`;
+                } else {
+                    console.error('No message from background');
+                }
+            }
+        }
+    }
 });

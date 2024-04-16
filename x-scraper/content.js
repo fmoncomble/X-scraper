@@ -125,9 +125,10 @@ function scrape() {
                     let tweetRelUrl = tweetUrlContainer.getAttribute('href');
                     let tweetUrl = `https://twitter.com${tweetRelUrl}`;
 
-                    let status = element[index].querySelector(
-                        'div[data-testid="tweetText"]'
-                    ).textContent.replaceAll(/[\u201C\u201D]/g, '"').replaceAll(/[\u2018\u2019]/g, "'");
+                    let status = element[index]
+                        .querySelector('div[data-testid="tweetText"]')
+                        .textContent.replaceAll(/[\u201C\u201D]/g, '"')
+                        .replaceAll(/[\u2018\u2019]/g, "'");
                     console.log('Status = ', status);
 
                     if (!tweetSet.has(tweetId)) {
@@ -164,6 +165,19 @@ ${status}
                         console.log('Max tweets = ', maxTweets);
                         tweetSet.add(tweetId);
                         console.log('Tweet set = ', tweetSet);
+                        function sendTweetCount() {
+                            console.log('sendTweetCount function invoked');
+                            let port = chrome.runtime.connect({
+                                name: 'contentjs',
+                            });
+                            console.log('Tweet Count sent: ', tweetCount);
+                            port.postMessage({
+                                tweetCount,
+                            });
+                        }
+
+                        sendTweetCount();
+
                         tweetCount++;
                     } else {
                         console.log('Skipping duplicate tweet: ', tweetId);
