@@ -1,0 +1,61 @@
+html {
+	border: none;
+	border-radius: 10px;
+	width: 272px;
+}
+
+body {
+    background-color: white;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: small;
+    width: 236px;
+    height: 250px;
+    padding: 10px;
+}
+
+button {
+    border: 1px solid;
+    border-color: #E0E0E0;
+    border-radius: 4px;
+    height: 32px;
+    width: auto;
+    color: #4285F4;
+    background-color: white;
+    text-align: center;
+    font-weight: 500;
+    font-family: system-ui, sans-serif;
+    margin: 1em;
+}
+
+button:hover {
+	border-color: #BBDEFB;
+	background-color: rgba(33, 150, 243, .04);
+    cursor: pointer;
+}
+
+button:active {
+	border: 2px solid;
+}
+
+#stopButton {
+    color: #ff0000;
+    background-color: #ffe6e6;
+}
+
+#stopButton:hover {
+    border-color: #ff0000;
+    cursor: pointer;
+}
+
+#error-msg {
+    font-weight: bold;
+    color: red;
+}
+
+#abort-msg {
+    font-weight: bold;
+    color: red;
+}
+
+

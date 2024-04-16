@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>𝕏-Scraper</title>
+        <link rel="stylesheet" type="text/css" href="popup.css" />
+        <script src="popup.js"></script>
+    </head>
+
+    <body>
+        <div id="content-container">
+            <h2 style="vertical-align: middle">𝕏-Scraper</h2>
+            <br />
+            <div id="error-msg" style="display: none">
+                Unsupported page: perform a search to scrape content
+            </div>
+            <div id="reload-div" style="display: none">
+                <div>Reload page to start scraping</div>
+                <button id="reloadButton">Reload</button>
+            </div>
+            <div id="scrape-container" style="display: none">
+                <div id="input-container">
+                    <label for="max-tweets">Max tweets:</label>
+                    <input type="number" id="max-tweets" name="max-tweets" />
+                </div>
+                <button id="scrapeButton" style="display: none">
+                    Start scraping
+                </button>
+                <button id="stopButton" style="display: none">
+                    Stop scraping
+                </button>
+                <div id="abort-msg" style="display: none">Aborted</div>
+            </div>
+            <div id="process-container"></div>
+            <button id="downloadButton" style="display: none">Download</button>
+            <div id="dl-container"></div>
+        </div>
+    </body>
+</html>
