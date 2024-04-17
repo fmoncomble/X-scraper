@@ -37,5 +37,6 @@ Remember:
 - Click `Download` to collect the output or `Reload` to start again 
 
 ### Known issues and limitations
+- **⚠️ Important!** The add-on's popup window needs to remain open for the extension to behave properly. Clicking outside it, switching to another tab/window, or switching to a different app will cause it to close, effectively preventing the user from interacting with the extension during or after the scraping process. This should be addressed in a forthcoming version.
 - Although Elon Musk has repeatedly expressed his opposition to scraping Twitter data, collecting publicly available data for research purposes is legal in most countries. However, as a precaution, it is advisable to create an ad-hoc account for this specific purpose. 
-- The add-on collects tweet by automatically scrolling the search results page. This makes repeated calls to the Twitter server, which eventually times out with a 429 response (Too may requests). When that happens (generally after scraping ~900 tweets), allow a few minutes for the server to 'cool down', then adjust your search parameters to avoid collecting duplicates and resume scraping. 
+- The add-on collects tweets by automatically scrolling the search results page. This makes repeated calls to the Twitter server, which eventually times out with a 429 response (Too may requests). When that happens (generally after scraping ~900 tweets), allow a few minutes for the server to 'cool down', then adjust your search parameters to avoid collecting duplicates and resume scraping. 
