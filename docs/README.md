@@ -23,7 +23,7 @@ Remember:
 - Pin the add-on to the toolbar
  
 ## Instructions for use
-- Navigate to [𝕏/Twitter](https://x.com/) and perform a search (simple or advanced)
+- Navigate to [𝕏/Twitter](https://twitter.com/search-advanced) and perform a search (simple or advanced)
     - It is advised to create a specific account for the purpose of scraping content
 - Click the add-on's icon in the toolbar
 - Click the `Reload` button for the add-on to work
@@ -35,3 +35,7 @@ Remember:
 - Click `Start scraping`
 - You can abort at any time
 - Click `Download` to collect the output or `Reload` to start again 
+
+### Known issues and limitations
+- Elon Musk has repeatedly expressed his opposition to scraping Twitter data, collecting publicly available data for research purposes is legal in most countries. However, as a precaution, it is advisable to create an ad-hoc account for this soecific purpose. 
+- The add-on collects tweet by automatically scrolling the search results page. This makes repeated calls to the Twitter server, which eventually times out with a 429 response (Too may requests). When that happens (generally after scraping ~900 tweets), allow a few minutes for the server to 'cool down', then adjust your search parameters to avoid collecting duplicates and resume scraping. 
