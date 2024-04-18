@@ -1,4 +1,4 @@
-[(Version française)](https://fmoncomble.github.io/x-scraper/README_fr.html)
+[(Version française)](https://fmoncomble.github.io/X-scraper/README_fr.html)
 
 An extension for extracting and downloading tweets for text mining.  
   

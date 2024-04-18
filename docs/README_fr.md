@@ -1,4 +1,4 @@
-[(English version)](https://fmoncomble.github.io/x-scraper)
+[(English version)](https://fmoncomble.github.io/X-scraper)
 
 Une extension pour extraire et télécharger des tweets à des fins de fouille textuelle.  
   
