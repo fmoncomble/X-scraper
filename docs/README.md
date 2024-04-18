@@ -26,16 +26,16 @@ Remember:
 - Navigate to [𝕏/Twitter](https://twitter.com/search-advanced) and perform a search (simple or advanced)
     - It is advised to create a specific account for the purpose of scraping content
 - Click the add-on's icon in the toolbar
-- Click the `Reload` button for the add-on to work
-- (Optional) Enter the maximum number of tweets to scrape
-- Choose desired output file format:
-    - `XML` for an XML-TEI file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/) with the `XML-TEI Zero + CSV` module
-    - `TXT` for a plain text file
-    - `CSV`
-    - `JSON`
 - Click `Start scraping`
+- The interface appears as a layer over the current webpage:
+    - (Optional) Set the maximum number of tweets to scrape
+    - Choose your preferred output format:
+        - `XML/XTZ`for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero`module
+        - `TXT` for plain text
+        - `CSV`
+        - `JSON`
 - You can abort at any time
-- Click `Download` to collect the output or `Reload` to start again 
+- Click `Download` to collect the output 
 
 ### Known issues and limitations
 - **⚠️ Important!** In v0.2, the add-on's popup window needs to remain open for the extension to behave properly. Clicking outside it, switching to another tab/window, or switching to a different app will cause it to close, effectively preventing the user from interacting with the extension during or after the scraping process. **This is addressed in v0.3 through a redesigned interface:** make sure to download the newest version.
