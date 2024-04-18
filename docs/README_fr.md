@@ -31,6 +31,7 @@ N'oubliez pas :
     - (Facultatif) Définissez le nombre maximum de tweets à récupérer
     - Choisissez le format de sortie désiré :
         - `XML/XTZ` pour un fichier XML à importer dans [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) en utilisant le module `XML/TEI-Zero`.
+            - Lors de l'import, ouvrez la section "Plans textuels" et entrez `ref` dans le champ « Hors texte à éditer »
         - `TXT` pour du texte brut
         - `CSV`
         - `JSON`

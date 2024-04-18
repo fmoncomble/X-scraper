@@ -33,6 +33,7 @@ Remember:
     - (Optional) Set the maximum number of tweets to scrape
     - Choose your preferred output format:
         - `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero`module
+          - When initiating the import process, open the "Textual planes" section and type `ref` in the field labelled "Out of text to edit"
         - `TXT` for plain text
         - `CSV`
         - `JSON`
