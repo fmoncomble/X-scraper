@@ -30,7 +30,7 @@ Remember:
 - The interface appears as a layer over the current webpage:
     - (Optional) Set the maximum number of tweets to scrape
     - Choose your preferred output format:
-        - `XML/XTZ`for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero`module
+        - `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero`module
         - `TXT` for plain text
         - `CSV`
         - `JSON`
