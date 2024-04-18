@@ -10,12 +10,11 @@ body {
     font-family: system-ui, sans-serif;
     font-size: small;
     width: 236px;
-    height: 350px;
+    height: 150px;
     padding: 10px;
 }
 
-button,
-select {
+button {
     border: 1px solid;
     border-color: #e0e0e0;
     border-radius: 4px;
@@ -29,13 +28,11 @@ select {
     margin: 1em;
 }
 
-select:focus-visible,
 button:focus-visible {
     outline: none;
 }
 
-button:hover,
-select:hover {
+button:hover {
     border-color: #bbdefb;
     background-color: rgba(33, 150, 243, 0.04);
     cursor: pointer;
@@ -43,39 +40,4 @@ select:hover {
 
 button:active {
     border: 2px solid;
-}
-
-input {
-    border: none;
-    background-color: #f2f2f2;
-    color: #041f4a;
-    margin: 1em;
-    border-radius: 4px;
-    height: 32px;
-    width: 8em;
-    padding-left: 1em;
-}
-
-input:focus-visible {
-    outline: solid 1px #041f4a;
-}
-
-#stopButton {
-    color: #ff0000;
-    background-color: #ffe6e6;
-}
-
-#stopButton:hover {
-    border-color: #ff0000;
-    cursor: pointer;
-}
-
-#error-msg {
-    font-weight: bold;
-    color: red;
-}
-
-#abort-msg {
-    font-weight: bold;
-    color: red;
 }
