@@ -31,6 +31,7 @@ Remember:
 - Choose desired output file format:
     - `XML` for an XML-TEI file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/) with the `XML-TEI Zero + CSV` module
     - `TXT` for a plain text file
+    - `CSV`
     - `JSON`
 - Click `Start scraping`
 - You can abort at any time
