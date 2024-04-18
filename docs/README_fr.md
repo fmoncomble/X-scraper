@@ -1,3 +1,5 @@
+[(English version)](https://fmoncomble.github.io/x-scraper)
+
 Une extension pour extraire et télécharger des tweets à des fins de fouille textuelle.  
   
 ### Citer ce programme
@@ -24,7 +26,7 @@ N'oubliez pas :
 - Naviguez vers [𝕏/Twitter](https://twitter.com/search-advanced) et effectuez une recherche (simple ou avancée)
     - Il est conseillé de créer un compte spécifique pour la récupération automatique de contenu
 - Cliquez sur l'icône de l'extension dans la barre d'outils.
-- Cliquez sur "Démarrer le scraping"
+- Cliquez sur `Start scraping`
 - L'interface apparait par-dessus la page web :
     - (Facultatif) Définissez le nombre maximum de tweets à récupérer
     - Choisissez le format de sortie désiré :
@@ -33,7 +35,7 @@ N'oubliez pas :
         - `CSV`
         - `JSON`
 - Vous pouvez arrêter l'extraction à tout moment
-- Cliquez sur `Télécharger` pour collecter le résultat. 
+- Cliquez sur `Download` pour collecter le résultat. 
 ## Problèmes et limitations connus
 ### Nombre excessif de requêtes
 L'extension collecte les tweets en faisant défiler automatiquement la page des résultats de la recherche. Cela envoie des appels répétés au serveur 𝕏/Twitter, qui finit par **ne plus régénérer la page** avec une réponse 429 (nombre excessif de requêtes). Lorsque cela se produit (généralement après avoir collecté ~900 tweets), **téléchargez le fichier**, réinitialisez (bouton `Reset`), patientez quelques minutes, puis ajustez vos paramètres de recherche pour éviter de collecter des doublons et reprenez la collecte. 
