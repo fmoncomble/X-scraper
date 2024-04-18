@@ -36,8 +36,9 @@ N'oubliez pas :
         - `CSV`
         - `JSON`
 - Vous pouvez arrêter l'extraction à tout moment
-- Cliquez sur `Download` pour collecter le résultat. 
-## Problèmes et limitations connus
+- Cliquez sur `Download` pour collecter le résultat.
+
+## Limites et problèmes connus
 ### Nombre excessif de requêtes
 L'extension collecte les tweets en faisant défiler automatiquement la page des résultats de la recherche. Cela envoie des appels répétés au serveur 𝕏/Twitter, qui finit par **ne plus régénérer la page** avec une réponse 429 (nombre excessif de requêtes). Lorsque cela se produit (généralement après avoir collecté ~900 tweets), **téléchargez le fichier**, réinitialisez (bouton `Reset`), patientez quelques minutes, puis ajustez vos paramètres de recherche pour éviter de collecter des doublons et reprenez la collecte. 
 ### Refonte de l'interface
