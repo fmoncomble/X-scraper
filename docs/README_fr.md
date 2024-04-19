@@ -24,7 +24,7 @@ N'oubliez pas :
 - Épinglez l'extension à la barre d'outils
  
 ## Mode d'emploi
-- Naviguez vers [𝕏/Twitter](https://twitter.com/search-advanced) et effectuez une recherche (simple ou avancée)
+- Ouvrez [𝕏/Twitter](https://twitter.com/search-advanced) et effectuez une recherche (simple ou avancée)
     - Il est conseillé de créer un compte spécifique pour la récupération automatique de contenu
 - Cliquez sur l'icône de l'extension dans la barre d'outils.
 - Cliquez sur `Start scraping`
