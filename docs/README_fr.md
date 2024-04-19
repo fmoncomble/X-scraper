@@ -13,6 +13,7 @@ Moncomble, F. (2024). *𝕏-Scraper* (Version 0.3) [JavaScript]. Arras, France :
 N'oubliez pas :
 - d'épingler l'extension à la barre d'outils
 - de "toujours autoriser sur twitter.com" en faisant un clic droit sur l'icône
+
 ### Chrome/Edge
 - [Téléchargez l'archive .zip](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.zip)
 - Décompressez l'archive
@@ -22,7 +23,7 @@ N'oubliez pas :
   - Sélectionnez le dossier décompressé
 - Épinglez l'extension à la barre d'outils
  
-## Instructions pour l'utilisation
+## Mode d'emploi
 - Naviguez vers [𝕏/Twitter](https://twitter.com/search-advanced) et effectuez une recherche (simple ou avancée)
     - Il est conseillé de créer un compte spécifique pour la récupération automatique de contenu
 - Cliquez sur l'icône de l'extension dans la barre d'outils.
