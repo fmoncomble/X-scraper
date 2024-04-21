@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!url.includes('twitter.com/search?')) {
             errorMsg.style.display = 'inline-block';
         } else {
-            scrapeContainer.style.display = 'inline-block';
+            checkPermissions();
         }
     });
 
@@ -72,5 +72,4 @@ document.addEventListener('DOMContentLoaded', function () {
     document
         .getElementById('grant-permissions')
         .addEventListener('click', requestPermissions);
-    checkPermissions();
 });
