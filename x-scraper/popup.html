@@ -8,40 +8,22 @@
     </head>
 
     <body>
-        <div id="content-container">
-            <h2 style="vertical-align: middle">𝕏-Scraper</h2>
-            <br />
+        <h2 style="vertical-align: middle">𝕏-Scraper</h2>
+        <br />
+        <div id="grant-permissions" style="display:none">
+            <div>Grant access to twitter.com?</div>
+            <button id="grant-permissions">OK</button>
+        </div>
+        <div id="content-container" style="display:none">
             <div id="error-msg" style="display: none">
-                Unsupported page: perform a search to scrape content
+                Unsupported page: perform an <a href="https://x.com/search-advanced/" target="_blank">𝕏/Twitter search</a> to scrape content
             </div>
-            <!-- <div id="reload-div" style="display: none">
-                <div>Reload page to start scraping</div>
-                <button id="reloadButton">Reload</button>
-            </div> -->
             <div id="scrape-container" style="display: none">
                 <div id="input-container">
-                    <!-- <label for="max-tweets">Max tweets:</label>
-                    <input type="number" id="max-tweets" name="max-tweets" />
-                </div>
-                <div id="format-container">
-                    <label for="file-format">Choose file format:</label>
-                    <select id="file-format" name="file-format">
-                        <option value="xml">XML/TEI</option>
-                        <option value="txt">TXT</option>
-                        <option value="json">JSON</option>
-                    </select>
-                </div> -->
                 <button id="scrapeButton">
                     Start scraping
                 </button>
-                <!-- <button id="stopButton" style="display: none">
-                    Stop scraping
-                </button>
-                <div id="abort-msg" style="display: none">Aborted</div> -->
             </div>
-            <!-- <div id="process-container"></div>
-            <button id="downloadButton" style="display: none">Download XML</button>
-            <div id="dl-container"></div> -->
         </div>
     </body>
 </html>

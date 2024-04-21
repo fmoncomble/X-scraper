@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const tab = tabs[0];
         const url = tab ? tab.url : '';
-        if (!url.includes('search')) {
+        if (!url.includes('twitter.com/search')) {
             errorMsg.style.display = 'inline-block';
         } else {
             scrapeContainer.style.display = 'inline-block';
@@ -30,4 +30,47 @@ document.addEventListener('DOMContentLoaded', function () {
         );
         window.close();
     });
+
+    // This function checks if the extension has the necessary permissions
+    async function checkPermissions() {
+        const permissionsToCheck = {
+            origins: ['*://twitter.com/*'],
+        };
+
+        const hasPermissions = await chrome.permissions.contains(
+            permissionsToCheck
+        );
+        if (!hasPermissions) {
+            document.getElementById('grant-permissions').style.display =
+                'block';
+        } else if (hasPermissions) {
+            document.getElementById('content-container').style.display =
+                'block';
+        }
+    }
+
+    // This function requests permissions
+    async function requestPermissions() {
+        const permissionsToRequest = {
+            origins: ['*://twitter.com/*'],
+        };
+
+        function onResponse(response) {
+            if (response) {
+                console.log('Permission was granted');
+            } else {
+                console.log('Permission was refused');
+            }
+            return chrome.permissions.getAll();
+        }
+
+        const response = await chrome.permissions.request(permissionsToRequest);
+        const currentPermissions = await onResponse(response);
+        console.log(`Current permissions:`, currentPermissions);
+    }
+
+    document
+        .getElementById('grant-permissions')
+        .addEventListener('click', requestPermissions);
+    checkPermissions();
 });

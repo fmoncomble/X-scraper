@@ -41,3 +41,7 @@ button:hover {
 button:active {
     border: 2px solid;
 }
+
+div#error-msg {
+    color: red;
+}

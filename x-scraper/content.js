@@ -10,8 +10,6 @@ let csvData = [];
 const modal = document.createElement('div');
 modal.setAttribute('id', 'modal');
 console.log('Modal injected: ', modal);
-const firstElt = document.body.firstElementChild;
-console.log('First element located, ', firstElt);
 document.body.before(modal);
 
 const scrapeFrame = document.createElement('div');
@@ -128,17 +126,17 @@ function resetInterface() {
 
 window.onclick = function (event) {
     if (event.target == modal) {
-        resetInterface();
+        abort = true;
         modal.style.display = 'none';
     }
 };
 closeButton.addEventListener('click', () => {
-    resetInterface();
+    abort = true;
     modal.style.display = 'none';
 });
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-        resetInterface();
+        abort = true;
         modal.style.display = 'none';
     }
 });
