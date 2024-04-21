@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const tab = tabs[0];
         const url = tab ? tab.url : '';
-        if (!url.includes('twitter.com/search')) {
+        if (!url.includes('twitter.com/search?')) {
             errorMsg.style.display = 'inline-block';
         } else {
             scrapeContainer.style.display = 'inline-block';
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('grant-permissions').style.display =
                 'block';
         } else if (hasPermissions) {
-            document.getElementById('content-container').style.display =
+            document.getElementById('scrape-container').style.display =
                 'block';
         }
     }
