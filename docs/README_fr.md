@@ -8,18 +8,14 @@ Si vous utilisez cette extension pour votre recherche, veuillez la référencer 
 Moncomble, F. (2024). *𝕏-Scraper* (Version 0.3) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/X-scraper/
 
 ## Installation
-### Firefox (recommandé : mises à jour automatiques)
-[ ![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)  
-N'oubliez pas d'épingler l'extension à la barre d'outils.
+### Firefox
+[![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)  
 
 ### Chrome/Edge
-- [Téléchargez l'archive .zip](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.zip)
-- Décompressez l'archive
-- Ouvrez le gestionnaire d'extensions : `chrome://extensions` ou `edge://extensions`
-  - Activez le « mode développeur »
-  - Cliquez sur « charger l'extension non empaquetée »
-  - Sélectionnez le dossier décompressé
-- Épinglez l'extension à la barre d'outils
+[![available-chrome-web-store4321](https://github.com/fmoncomble/X-scraper/assets/59739627/c23ea0a7-0c42-452e-89c0-0772314acac2)](https://chromewebstore.google.com/detail/%F0%9D%95%8F-scraper/elhnicjnbaaikfofmgmnbfdoeihnpmjg)  
+  
+Pensez à épingler l'extension à la barre d'outils
+
  
 ## Mode d'emploi
 - Ouvrez [𝕏/Twitter](https://twitter.com/search-advanced) et effectuez une recherche (simple ou avancée)
