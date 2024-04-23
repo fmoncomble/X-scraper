@@ -9,18 +9,12 @@ Moncomble, F. (2024). *𝕏-Scraper* (Version 0.3) [JavaScript]. Arras, France: 
 
 
 ## Installation
-### Firefox (recommended: automatic updates)
+### Firefox
 [![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)  
-Remember to pin the add-on to the toolbar.
-
 ### Chrome/Edge
-- [Download .zip archive](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.zip)
-- Unzip the archive
-- Open the extensions manager: `chrome://extensions` or `edge://extensions`
-  - Activate "developer mode"
-  - Click "Load unpacked"
-  - Select the unzipped folder
-- Pin the add-on to the toolbar
+[![available-chrome-web-store4321](https://github.com/fmoncomble/X-scraper/assets/59739627/7d811f02-a1a6-4fc4-acc5-e70fa142a8c3)](https://chromewebstore.google.com/detail/%F0%9D%95%8F-scraper/elhnicjnbaaikfofmgmnbfdoeihnpmjg)
+
+Remember to pin the add-on to the toolbar.
  
 ## Instructions for use
 - Navigate to [𝕏/Twitter](https://twitter.com/search-advanced) and perform a search (simple or advanced)
