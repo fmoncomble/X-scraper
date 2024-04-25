@@ -4,8 +4,8 @@ let i = 1;
 let tweetCount = 0;
 let file;
 let abort = false;
-let tweetSet = new Set();
-let csvData = [];
+let tweetSet;
+let csvData;
 
 const modal = document.createElement('div');
 modal.setAttribute('id', 'modal');
@@ -207,12 +207,15 @@ async function triggerScrape() {
 
 function scrape() {
     console.log('File format = ', fileFormat);
+    tweetSet = new Set();
     if (fileFormat === 'xml') {
         file = `<Text>`;
     } else if (fileFormat === 'json') {
         file = {};
     } else if (fileFormat === 'txt') {
         file = '';
+    } else if (fileFormat === 'csv') {
+        csvData = [];
     }
 
     abort = false;
@@ -367,7 +370,7 @@ function download() {
     } else if (fileFormat === 'csv') {
         function convertToCsv(data) {
             const header = Object.keys(data[0]).join('\t');
-            const rows = data.map(obj => Object.values(obj).join('\t'));
+            const rows = data.map((obj) => Object.values(obj).join('\t'));
             return [header, ...rows].join('\n');
         }
         const csvString = convertToCsv(csvData);
