@@ -288,7 +288,8 @@ function scrape() {
                         let status = element[index]
                             .querySelector('div[data-testid="tweetText"]')
                             .textContent.replaceAll(/[\u201C\u201D]/g, '"')
-                            .replaceAll(/[\u2018\u2019]/g, "'");
+                            .replaceAll(/[\u2018\u2019]/g, "'")
+                            .normalize('NFC');
                         console.log('Status = ', status);
 
                         if (!tweetSet.has(tweetId)) {
@@ -298,8 +299,7 @@ function scrape() {
                                     .replaceAll('<', '&lt;')
                                     .replaceAll('>', '&gt;')
                                     .replaceAll('"', '&quot;')
-                                    .replaceAll("'", '&apos;')
-                                    .normalize('NFC');
+                                    .replaceAll("'", '&apos;');
                                 file =
                                     file +
                                     `
