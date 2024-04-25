@@ -263,7 +263,7 @@ function scrape() {
                         let userNameContainer = userNameContainers.find((e) =>
                             e.textContent.startsWith('@')
                         );
-                        let userName = userNameContainer.textContent;
+                        let userName = userNameContainer.textContent.normalize('NFC');
                         console.log('User name = ', userName);
                         let time = element[index]
                             .querySelector('time')
@@ -298,7 +298,8 @@ function scrape() {
                                     .replaceAll('<', '&lt;')
                                     .replaceAll('>', '&gt;')
                                     .replaceAll('"', '&quot;')
-                                    .replaceAll("'", '&apos;');
+                                    .replaceAll("'", '&apos;')
+                                    .normalize('NFC');
                                 file =
                                     file +
                                     `
