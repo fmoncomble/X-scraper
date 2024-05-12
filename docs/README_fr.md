@@ -29,6 +29,7 @@ Pensez à épingler l'extension à la barre d'outils
             - Lors de l'import, ouvrez la section "Plans textuels" et entrez `ref` dans le champ « Hors texte à éditer »
         - `TXT` pour du texte brut
         - `CSV`
+        - `XLSX` (tableau Excel)
         - `JSON`
 - Vous pouvez arrêter l'extraction à tout moment
 - Cliquez sur `Download` pour collecter le résultat.
