@@ -1,15 +1,15 @@
 {
     "manifest_version": 3,
     "name": "𝕏-Scraper",
-    "version": "0.3.6",
+    "version": "0.4",
     "description": "A browser extension to scrape 𝕏/Twitter search results",
     "homepage_url": "https://fmoncomble.github.io/X-scraper/",
     "permissions": ["activeTab", "tabs"],
     "host_permissions": ["*://twitter.com/*"],
     "content_scripts": [
         {
-            "matches": ["*://twitter.com/*"],
-            "js": ["content.js"],
+            "matches": ["*://twitter.com/*", "*://x.com/*"],
+            "js": ["content.js", "xlsx.full.min.js"],
             "css": ["content.css"]
         }
     ],

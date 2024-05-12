@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const tab = tabs[0];
         const url = tab ? tab.url : '';
-        if (!url.includes('twitter.com/search?')) {
+        if (!url.includes('twitter.com/search?') && !url.includes('x.com/search?')) {
             errorMsg.style.display = 'inline-block';
         } else {
             checkPermissions();
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // This function checks if the extension has the necessary permissions
     async function checkPermissions() {
         const permissionsToCheck = {
-            origins: ['*://twitter.com/*'],
+            origins: ['*://twitter.com/*', '*://x.com/*'],
         };
 
         const hasPermissions = await chrome.permissions.contains(
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // This function requests permissions
     async function requestPermissions() {
         const permissionsToRequest = {
-            origins: ['*://twitter.com/*'],
+            origins: ['*://twitter.com/*', '*://x.com/*'],
         };
 
         function onResponse(response) {
