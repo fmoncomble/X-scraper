@@ -302,6 +302,7 @@ ${status}
 <lb></lb>
 <lb></lb>`;
                             } else if (fileFormat === 'json') {
+                                status = status.replaceAll('\n', ' ');
                                 file[tweetId] = {
                                     username: `${userName}`,
                                     date: `${date}`,
@@ -321,6 +322,7 @@ ${status}
                                 status = status.replaceAll('\n', ' ');
                                 csvData.push({ userName, date, time, tweetUrl, status });
                             } else if (fileFormat === 'xlsx') {
+                                status = status.replaceAll('\n', ' ');
                                 let row = [userName, date, time, tweetUrl, status];
                                 XLSX.utils.sheet_add_aoa(sheet, [row], { origin: -1 });
                             }
