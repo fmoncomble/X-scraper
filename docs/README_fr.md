@@ -5,7 +5,7 @@ Une extension pour extraire et télécharger des tweets à des fins de fouille t
 ### Citer ce programme
 Si vous utilisez cette extension pour votre recherche, veuillez la référencer comme suit :  
   
-Moncomble, F. (2024). *𝕏-Scraper* (Version 0.3) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2024). *𝕏-Scraper* (Version 0.4) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/X-scraper/
 
 ## Installation
 ### Firefox
