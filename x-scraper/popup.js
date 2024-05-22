@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const tab = tabs[0];
         const url = tab ? tab.url : '';
-        if (!url.includes('twitter.com/search?') && !url.includes('x.com/search?')) {
+        if (!url.includes('x.com/search?') && !url.includes('x.com/search?')) {
             errorMsg.style.display = 'inline-block';
         } else {
             checkPermissions();
