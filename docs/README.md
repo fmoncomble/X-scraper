@@ -5,7 +5,7 @@ An extension for extracting and downloading tweets for text mining.
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *𝕏-Scraper* (Version 0.4) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2025). *𝕏-Scraper* (Version 0.5) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
 
 
 ## Installation
@@ -31,11 +31,12 @@ Remember to pin the add-on to the toolbar.
         - `XLSX` (Excel spreadsheet)
         - `JSON`
 - You can abort at any time
+- ⚠️ User requests to the 𝕏 server are rate-limited (50 requests — each returning 20 tweets — per 15 minutes). As of v0.5, the extension now handles your rate limit automatically: if the number of tweets you want to scrape exceeds your current allowance, or if you do not set a maximum number, requests are paced at a rate of one every 18 seconds. This allows for your rate limit to reset before it is exhausted, preventing the collection process from stalling. 
 - Click `Download` to collect the output 
 
 ## Known issues and limitations
-### Too many requests
-The add-on collects tweets by automatically scrolling the search results page. This makes repeated calls to the 𝕏/Twitter server, which eventually **times out** with a 429 response (Too many requests). When that happens (generally after scraping ~900 tweets), **download the file**, reset, allow a few minutes for the server to 'cool down', then adjust your search parameters to avoid collecting duplicates and resume scraping. 
+### ~~Too many requests~~
+~~The add-on collects tweets by automatically scrolling the search results page. This makes repeated calls to the 𝕏/Twitter server, which eventually **times out** with a 429 response (Too many requests). When that happens (generally after scraping ~900 tweets), **download the file**, reset, allow a few minutes for the server to 'cool down', then adjust your search parameters to avoid collecting duplicates and resume scraping.~~ 
 ### Interface redesign
 **⚠️ Important!** In v0.2, the add-on's popup window needs to remain open for the extension to behave properly. Clicking outside it, switching to another tab/window, or switching to a different app will cause it to close, effectively preventing the user from interacting with the extension during or after the scraping process.  
 **This is addressed in v0.3 through a redesigned interface:** make sure to download the newest version.

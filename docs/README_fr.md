@@ -31,12 +31,13 @@ Pensez à épingler l'extension à la barre d'outils
         - `CSV`
         - `XLSX` (tableau Excel)
         - `JSON`
-- Vous pouvez arrêter l'extraction à tout moment
+- Vous pouvez arrêter l'extraction à tout moment.
+- ⚠️ Le nombre de requêtes utilisateur au serveur 𝕏 est plafonné à 50 par période de 15 minutes (chaque requête renvoyant 20 tweets maximum). À partir de la v0.5, l'extension gère ce plafond automatiquement : si le nombre de tweets souhaité dépasse votre limite actuelle, ou si vous ne réglez pas le nombre maximum de tweets à collecter, les requêtes sont espacées de 18 secondes. Cela permet au plafond d'être réinitialisé avant d'être atteint, et ainsi à la collecte de continuer sans interruption. 
 - Cliquez sur `Download` pour collecter le résultat.
 
 ## Limites et problèmes connus
-### Nombre excessif de requêtes
-L'extension collecte les tweets en faisant défiler automatiquement la page des résultats de la recherche. Cela envoie des appels répétés au serveur 𝕏/Twitter, qui finit par **ne plus régénérer la page** avec une réponse 429 (nombre excessif de requêtes). Lorsque cela se produit (généralement après avoir collecté ~900 tweets), **téléchargez le fichier**, réinitialisez (bouton `Reset`), patientez quelques minutes, puis ajustez vos paramètres de recherche pour éviter de collecter des doublons et reprenez la collecte. 
+### ~~Nombre excessif de requêtes~~
+~~L'extension collecte les tweets en faisant défiler automatiquement la page des résultats de la recherche. Cela envoie des appels répétés au serveur 𝕏/Twitter, qui finit par **ne plus régénérer la page** avec une réponse 429 (nombre excessif de requêtes). Lorsque cela se produit (généralement après avoir collecté ~900 tweets), **téléchargez le fichier**, réinitialisez (bouton `Reset`), patientez quelques minutes, puis ajustez vos paramètres de recherche pour éviter de collecter des doublons et reprenez la collecte.~~ 
 ### Refonte de l'interface
 **⚠️ Important!** Dans la v0.2, la fenêtre popup de l'extension doit rester ouverte pour que l'extension se comporte correctement. Cliquer en dehors de la fenêtre, passer à un autre onglet/fenêtre ou à une autre application entraine sa fermeture, empêchant ainsi l'utilisateur d'interagir avec l'extension pendant ou après le processus de scraping.  
 **Ce problème a été résolu dans la version 0.3 grâce à une interface remaniée:** assurez-vous de télécharger la dernière version.
