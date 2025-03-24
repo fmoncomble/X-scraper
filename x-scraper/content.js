@@ -200,7 +200,6 @@ scrapeUIContainer.appendChild(resetDiv);
 
 downloadButton.addEventListener('click', () => {
     processResults(results);
-    download();
     resumeButton.style.display = 'none';
     resetMsg.textContent = 'Click "Reset" to start afresh';
     resetDiv.style.display = 'block';
@@ -396,21 +395,32 @@ async function scrape(cursor) {
 
 function processResults(results) {
     let tweets = results.map((r) => {
-        let tweet = r.content.itemContent.tweet_results.result;
-        let tweetData = {
-            id: tweet.legacy.id_str,
-            user_id: tweet.legacy.user_id_str,
-            user_handle: tweet.core.user_results.result.legacy.screen_name,
-            user_name: tweet.core.user_results.result.legacy.name,
-            timestamp: tweet.legacy.created_at,
-            text: tweet.legacy.full_text,
-            like_count: tweet.legacy.favorite_count,
-            retweet_count: tweet.legacy.retweet_count,
-            quote_count: tweet.legacy.quote_count,
-            reply_count: tweet.legacy.reply_count,
-            url: `https://x.com/${tweet.legacy.user_id_str}/status/${tweet.legacy.id_str}`,
-        };
-        return tweetData;
+        try {
+            let tweet = r.content.itemContent.tweet_results.result;
+            if (!tweet.legacy) {
+                tweet = tweet.tweet;
+            }
+            let tweetData = {
+                id: tweet.legacy.id_str,
+                user_id: tweet.legacy.user_id_str,
+                user_handle: tweet.core.user_results.result.legacy.screen_name,
+                user_name: tweet.core.user_results.result.legacy.name,
+                timestamp: tweet.legacy.created_at,
+                text: tweet.legacy.full_text,
+                like_count: tweet.legacy.favorite_count,
+                retweet_count: tweet.legacy.retweet_count,
+                quote_count: tweet.legacy.quote_count,
+                reply_count: tweet.legacy.reply_count,
+                url: `https://x.com/${tweet.legacy.user_id_str}/status/${tweet.legacy.id_str}`,
+            };
+            return tweetData;
+        } catch (error) {
+            console.error(
+                `Error with tweet ${results.indexOf(r) + 1}: `,
+                r,
+                error
+            );
+        }
     });
     if (fileFormat === 'xml') {
         makeXml(tweets);
@@ -493,12 +503,12 @@ function makeXlsx(tweets) {
 }
 
 function download(blob, filename) {
-    var url = window.URL.createObjectURL(blob);
+    var url = URL.createObjectURL(blob);
     var anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = filename;
     anchor.click();
-    window.URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
