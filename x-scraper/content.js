@@ -405,7 +405,7 @@ function processResults(results) {
                 user_id: tweet.legacy.user_id_str,
                 user_handle: tweet.core.user_results.result.legacy.screen_name,
                 user_name: tweet.core.user_results.result.legacy.name,
-                timestamp: tweet.legacy.created_at,
+                timestamp: new Date(tweet.legacy.created_at).toISOString(),
                 text: tweet.legacy.full_text,
                 like_count: tweet.legacy.favorite_count,
                 retweet_count: tweet.legacy.retweet_count,
