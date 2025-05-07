@@ -282,7 +282,9 @@ let rateReset;
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.message === 'request_headers') {
         requestUrl = message.url;
+        console.log('Request URL: ', requestUrl);
         requestHeaders = message.headers;
+        console.log('Request Headers: ', requestHeaders);
     }
     if (message.message === 'response_headers') {
         let rateLimitRemainingObj = message.headers.find((h) => {
@@ -330,16 +332,50 @@ async function scrape(cursor) {
     }
     let url = new URL(requestUrl.split('?')[0]);
     let requestSearchParams = new URLSearchParams(requestUrl.split('?')[1]);
+    // let features = requestSearchParams.get('features');
+    // if (features) {
+    //     requestSearchParams.delete('features');
+    // }
     let variables = JSON.parse(requestSearchParams.get('variables'));
-    variables.count = 40;
+    // variables.count = 40;
     if (cursor) {
         variables.cursor = cursor;
     }
     requestSearchParams.set('variables', JSON.stringify(variables));
     url = url + '?' + requestSearchParams.toString();
     let headers = new Headers();
+    console.log('URL: ', url);
+    console.log('Headers: ', requestHeaders);
     requestHeaders.forEach((h) => headers.append(h.name, h.value));
+    headers.set('Priority', 'u=0');
+    let transactionId;
+    await new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+            { action: 'get_transaction_id', url: window.location.href },
+            function (response) {
+                console.log('Response: ', response);
+                if (response && response.transactionId) {
+                    transactionId = response.transactionId;
+                    resolve(transactionId);
+                } else {
+                    console.error('Error: ', response);
+                    resolve(null);
+                }
+            }
+        );
+    });
+    console.log('Transaction ID: ', transactionId);
+    if (!transactionId) {
+        console.error('Error: Transaction ID not found');
+        return;
+    }
+    headers.set('x-client-transaction-id', transactionId);
     let res = await fetch(url, { headers: headers });
+    console.log('Response: ', res);
+    if (res.status !== 200) {
+        console.error('Error: ', res.status);
+        return;
+    }
     let data = await res.json();
     let instructions =
         data.data.search_by_raw_query.search_timeline.timeline.instructions;
@@ -347,12 +383,17 @@ async function scrape(cursor) {
         endScrape();
         return;
     }
-    let entries = instructions[0].entries;
+    // let entries = instructions[0].entries;
+    let entries = instructions.find(
+        (i) => i.type === 'TimelineAddEntries'
+    ).entries;
+    console.log('Entries: ', entries);
     if (!entries || entries.length === 0) {
         endScrape();
         return;
     }
     let tweets = entries.filter((e) => e.entryId.includes('tweet'));
+    console.log('Tweets: ', tweets);
     results.push(...tweets);
     if (maxTweets !== Infinity) {
         processContainer.textContent = `Scraped ${results.length} / ${maxTweets} tweet(s)`;
@@ -360,9 +401,14 @@ async function scrape(cursor) {
         processContainer.textContent = `Scraped ${results.length} tweet(s)`;
     }
     processContainer.textContent = `Scraped ${results.length} tweet(s)`;
+    // cursor =
+    //     entries[entries.length - 1].content.value ||
+    //     instructions[instructions.length - 1].entry.content.value;
     cursor =
-        entries[entries.length - 1].content.value ||
-        instructions[instructions.length - 1].entry.content.value;
+        entries.find((e) => e.entryId.includes('cursor-top')).content.value ||
+        instructions.find((i) => i.type === 'TimelineReplaceEntry').entry
+            .content.value;
+    console.log('Cursor: ', cursor);
     let tweetsLeft = maxTweets - results.length;
     if (
         !abort &&

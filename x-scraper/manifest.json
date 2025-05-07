@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "𝕏-Scraper",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "description": "A browser extension to scrape 𝕏/Twitter search results",
     "homepage_url": "https://fmoncomble.github.io/X-scraper/",
     "permissions": ["activeTab", "tabs", "webRequest", "cookies"],
@@ -14,8 +14,7 @@
         }
     ],
     "background": {
-        "service_worker": "background.js",
-        "scripts": ["background.js"]
+        "page": "background.html"
     },
     "icons": {
         "48": "icons/icon-48.png",
