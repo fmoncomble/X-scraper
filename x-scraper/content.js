@@ -110,6 +110,57 @@ resetDiv.appendChild(resetMsg);
 resetDiv.appendChild(resumeButton);
 resetDiv.appendChild(resetButton);
 
+let requestUrl;
+let requestHeaders;
+let rateLimitRemaining;
+let rateReset;
+let mode = 'default';
+
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+    if (message.message === 'request_headers') {
+        requestUrl = message.url;
+        requestHeaders = message.headers;
+    }
+    if (message.message === 'response_headers') {
+        let rateLimitRemainingObj = message.headers.find((h) => {
+            return h.name === 'x-rate-limit-remaining';
+        });
+        rateLimitRemaining = rateLimitRemainingObj.value;
+        let rateResetObj = message.headers.find((h) => {
+            return h.name === 'x-rate-limit-reset';
+        });
+        rateReset = rateResetObj.value;
+        if (rateLimitNotice.textContent === '') {
+            if (rateLimitRemaining > 0) {
+                rateLimitNotice.innerHTML = `You have ${rateLimitRemaining} requests left:\nto avoid exceeding your rate limit, scraping more than ${
+                    rateLimitRemaining * 20
+                } tweets will proceed at a rate of 20 tweets every 18 seconds`;
+            } else {
+                let resetTime = new Date(rateReset * 1000);
+                let now = new Date();
+                let timeToReset = resetTime - now;
+                let minutes = Math.floor((timeToReset % 3600000) / 60000);
+                let seconds = Math.floor((timeToReset % 60000) / 1000);
+                rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${seconds} seconds`;
+                for (
+                    let seconds = Math.floor(timeToReset / 1000);
+                    seconds >= 0;
+                    seconds--
+                ) {
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    if (seconds === 0) {
+                        window.location.reload();
+                    } else {
+                        let minutes = Math.floor((seconds % 3600) / 60);
+                        let secs = Math.floor(seconds % 60);
+                        rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${secs} seconds`;
+                    }
+                }
+            }
+        }
+    }
+});
+
 async function resetInterface() {
     abort = false;
     results = [];
@@ -216,13 +267,8 @@ resetButton.addEventListener('click', () => {
     resetInterface();
 });
 
-let requestUrl;
-let requestHeaders;
-let rateLimitRemaining;
-let rateReset;
-let mode = 'default';
-
 scrapeButton.addEventListener('click', async () => {
+    mode = 'default';
     let message = '';
     if (!maxTweets) {
         maxTweets = Infinity;
@@ -276,51 +322,6 @@ resumeButton.addEventListener('click', async () => {
         endScrape();
     } catch (error) {
         console.error('Error: ', error);
-    }
-});
-
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.message === 'request_headers') {
-        requestUrl = message.url;
-        requestHeaders = message.headers;
-    }
-    if (message.message === 'response_headers') {
-        let rateLimitRemainingObj = message.headers.find((h) => {
-            return h.name === 'x-rate-limit-remaining';
-        });
-        rateLimitRemaining = rateLimitRemainingObj.value;
-        let rateResetObj = message.headers.find((h) => {
-            return h.name === 'x-rate-limit-reset';
-        });
-        rateReset = rateResetObj.value;
-        if (rateLimitNotice.textContent === '') {
-            if (rateLimitRemaining > 0) {
-                rateLimitNotice.innerHTML = `You have ${rateLimitRemaining} requests left:\nto avoid exceeding your rate limit, scraping more than ${
-                    rateLimitRemaining * 20
-                } tweets will proceed at a rate of 20 tweets every 18 seconds`;
-            } else {
-                let resetTime = new Date(rateReset * 1000);
-                let now = new Date();
-                let timeToReset = resetTime - now;
-                let minutes = Math.floor((timeToReset % 3600000) / 60000);
-                let seconds = Math.floor((timeToReset % 60000) / 1000);
-                rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${seconds} seconds`;
-                for (
-                    let seconds = Math.floor(timeToReset / 1000);
-                    seconds >= 0;
-                    seconds--
-                ) {
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                    if (seconds === 0) {
-                        window.location.reload();
-                    } else {
-                        let minutes = Math.floor((seconds % 3600) / 60);
-                        let secs = Math.floor(seconds % 60);
-                        rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${secs} seconds`;
-                    }
-                }
-            }
-        }
     }
 });
 
