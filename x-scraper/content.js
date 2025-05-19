@@ -73,6 +73,21 @@ formatSelectLabel.textContent = 'Select output file format: ';
 formatDiv.appendChild(formatSelectLabel);
 formatDiv.appendChild(formatSelect);
 
+const anonDiv = document.createElement('div');
+anonDiv.setAttribute('id', 'anon-div');
+scrapeUIContainer.appendChild(anonDiv);
+const anonCheckbox = document.createElement('input');
+anonCheckbox.setAttribute('type', 'checkbox');
+anonCheckbox.setAttribute('id', 'anon-checkbox');
+anonCheckbox.setAttribute('name', 'anon-checkbox');
+anonCheckbox.classList.add('x-scraper');
+const anonCheckboxLabel = document.createElement('label');
+anonCheckboxLabel.setAttribute('for', 'anon-checkbox');
+anonCheckboxLabel.textContent = 'Anonymize tweets';
+anonCheckboxLabel.classList.add('x-scraper');
+anonDiv.appendChild(anonCheckbox);
+anonDiv.appendChild(anonCheckboxLabel);
+
 const buttonDiv = document.createElement('div');
 buttonDiv.setAttribute('id', 'button-div');
 scrapeUIContainer.appendChild(buttonDiv);
@@ -170,6 +185,7 @@ async function resetInterface() {
     scrapeButton.removeAttribute('style');
     stopButton.removeAttribute('style');
     downloadButton.removeAttribute('style');
+    anonDiv.removeAttribute('style');
     maxTweetsInput.value = '';
     maxTweets = null;
     maxTweetsInput.removeAttribute('style');
@@ -267,6 +283,11 @@ resetButton.addEventListener('click', () => {
     resetInterface();
 });
 
+let anon = false;
+anonCheckbox.addEventListener('change', () => {
+    anon = anonCheckbox.checked;
+});
+
 scrapeButton.addEventListener('click', async () => {
     mode = 'default';
     let message = '';
@@ -303,6 +324,7 @@ scrapeButton.addEventListener('click', async () => {
     }
 
     stopButton.style.display = 'inline-block';
+    anonDiv.style.display = 'none';
     scrapeButton.style.display = 'none';
     downloadButton.style.display = 'none';
     await scrape();
@@ -312,6 +334,7 @@ scrapeButton.addEventListener('click', async () => {
 resumeButton.addEventListener('click', async () => {
     abort = false;
     stopButton.style.display = 'inline-block';
+    anonDiv.style.display = 'none';
     scrapeButton.style.display = 'none';
     downloadButton.style.display = 'none';
     try {
@@ -375,6 +398,10 @@ observeMutations(iteration);
 function scrape() {
     rateLimitNotice.style.display = 'none';
     abort = false;
+    anon = anonCheckbox.checked;
+    let usernames = new Set();
+    let userDict = [];
+    let u = 1;
     return new Promise(async (resolve) => {
         if (abort) return;
         let scrollDelay = 1000;
@@ -383,10 +410,7 @@ function scrape() {
         }
         async function scrollToNext() {
             try {
-                if (
-                    abort ||
-                    results.length >= maxTweets
-                ) {
+                if (abort || results.length >= maxTweets) {
                     processContainer.textContent =
                         results.length + ' tweet(s) scraped';
                     resolve(results);
@@ -412,13 +436,6 @@ function scrape() {
                         let date = element[index]
                             .querySelector('time')
                             .getAttribute('datetime');
-
-                        let tweetId = `${userName}-${date}`;
-
-                        let dateElements = date.split('T');
-                        date = dateElements[0];
-                        time = dateElements[1].split('.')[0];
-
                         let rawUserName = userName.split('@')[1];
                         let tweetUrlContainer = userNameContainers.find((e) =>
                             e
@@ -443,15 +460,35 @@ function scrape() {
                             .replaceAll(/[\u201C\u201D]/g, '"')
                             .replaceAll(/[\u2018\u2019]/g, "'")
                             .normalize('NFC');
-
+                        if (anon) {
+                            if (!usernames.has(rawUserName)) {
+                                usernames.add(rawUserName);
+                                userDict.push({
+                                    username: rawUserName,
+                                    id: `x_user_${u}`,
+                                });
+                                u++;
+                            }
+                            userName = userDict.find(
+                                (user) => user.username === rawUserName
+                            ).id;
+                        } else {
+                            userName = rawUserName;
+                        }
+                        let tweetId = `${userName}-${date}`;
+                        let dateElements = date.split('T');
+                        date = dateElements[0];
+                        time = dateElements[1].split('.')[0];
                         let tweet = {
                             id: tweetId,
                             username: userName,
                             date: date,
                             time: time,
-                            url: tweetUrl,
                             text: status,
                         };
+                        if (!anon) {
+                            tweet.url = tweetUrl;
+                        }
 
                         if (!results.find((r) => r.id === tweetId)) {
                             results.push(tweet);
@@ -490,7 +527,8 @@ function scrape() {
                     scrollToNext();
                     i++;
                 } else {
-                    processContainer.textContent = results.length + ' tweet(s) scraped';
+                    processContainer.textContent =
+                        results.length + ' tweet(s) scraped';
                     resolve(results);
                     return;
                 }
@@ -498,7 +536,7 @@ function scrape() {
                 console.error(error);
             }
         }
-            scrollToNext();
+        scrollToNext();
 
         const interval = setInterval(() => {
             if (abort) {
@@ -520,7 +558,6 @@ function endScrape() {
     downloadButton.style.display = 'inline-block';
     return;
 }
-
 
 function processResults(results) {
     if (fileFormat === 'xml') {
@@ -553,7 +590,11 @@ function makeXml(tweets) {
                 xml += ` ${key}="${value}"`;
             }
         }
-        xml += `><lb/><ref target="${t.url}">Link to tweet</ref><lb/>`;
+        if (t.url) {
+            xml += `><lb/><ref target="${t.url}">Link to tweet</ref><lb/>`;
+        } else {
+            xml += '>';
+        }
         const urlRegex =
             /(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]/;
         let text = t.text;
