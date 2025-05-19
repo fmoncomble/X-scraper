@@ -5,7 +5,7 @@ Une extension pour extraire et télécharger des tweets à des fins de fouille t
 ### Citer ce programme
 Si vous utilisez cette extension pour votre recherche, veuillez la référencer comme suit :  
   
-Moncomble, F. (2024). *𝕏-Scraper* (Version 0.4) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2024). *𝕏-Scraper* (Version 0.6) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/X-scraper/
 
 ## Installation
 ### Firefox
@@ -24,6 +24,7 @@ Pensez à épingler l'extension à la barre d'outils
 - Cliquez sur `Start scraping`
 - L'interface apparait par-dessus la page web :
     - (Facultatif) Définissez le nombre maximum de tweets à récupérer
+    - (Facultatif) Cochez la case pour anonymiser les tweets : les noms d'utilisateur seront remplacés par des identifiants uniques du type `x_user_n°` et les URLs des tweets ne seront pas incluses.
     - Choisissez le format de sortie désiré :
         - `XML/XTZ` pour un fichier XML à importer dans [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) en utilisant le module `XML/TEI-Zero`.
             - Lors de l'import, ouvrez la section "Plans textuels" et entrez `ref` dans le champ « Hors texte à éditer »

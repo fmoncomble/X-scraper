@@ -5,7 +5,7 @@ An extension for extracting and downloading tweets for text mining.
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2025). *𝕏-Scraper* (Version 0.5) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2025). *𝕏-Scraper* (Version 0.6) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
 
 
 ## Installation
@@ -23,6 +23,7 @@ Remember to pin the add-on to the toolbar.
 - Click `Start scraping`
 - The interface appears as a layer over the current webpage:
     - (Optional) Set the maximum number of tweets to scrape
+    - (Optional) Tick the checkbox to anonymize the tweets: usernames will be replaced with unique identifiers of the form `x_user_#` and tweet URLs will not be included.
     - Choose your preferred output format:
         - `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
           - When initiating the import process, open the "Textual planes" section and type `ref` in the field labelled "Out of text to edit"
