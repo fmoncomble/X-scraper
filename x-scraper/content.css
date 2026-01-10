@@ -1,132 +1,276 @@
-#modal {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 10;
-    position: fixed;
-    display: none;
+dialog.x-scraper {
+	border: none;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	padding: 0;
+	width: 70%;
+	height: auto;
+	margin: auto;
+	color: black;
 }
 
-#scrape-frame {
-    border-radius: 10px;
-    background-color: white;
-    margin-top: 10%;
-    margin-left: 35%;
-    width: 30%;
-    padding: 2%;
-    color: black;
-    font-family: 'Roboto', system-ui, sans-serif;
-    font-weight: bold;
-    font-size: large;
-    text-align: center;
+select.x-sraper,
+button.x-scraper {
+	color: black;
+	border: solid 1px black;
+	background-color: white;
+	height: auto;
+	width: 7rem;
+	padding: 5px;
+	border-radius: 5px;
+	margin: 5px;
+	text-align: center;
 }
 
-#title-div {
-    margin-top: 10%;
-    margin-bottom: 5%;
-    font-size: x-large;
+button.x-scraper {
+	cursor: pointer;
 }
 
-#scrape-ui-container {
-    margin: 1em;
-    font-weight: normal;
-    font-size: small;
-    text-align: center;
+input.x-scraper[type='checkbox'] {
+	margin: auto 2px;
 }
 
-input#max-tweets-input {
-    border: none;
-    background-color: #f2f2f2;
-    color: #041f4a;
-    margin: 1em;
-    border-radius: 4px;
-    height: 32px;
-    width: 8em;
-    padding-left: 1em;
-    display: inline-block;
+.x-scraper#modal {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
 }
 
-input#max-tweets-input:focus-visible {
-    outline: solid 0.5px gray;
+.x-scraper#scrape-frame {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	border-radius: 10px;
+	background-color: white;
+	width: 50%;
+	height: 40%;
+	padding: 2%;
+	color: black;
+	font-family: 'Roboto', system-ui, sans-serif;
+	font-weight: bold;
+	font-size: large;
+	text-align: center;
 }
 
-input[type="checkbox"] {
-    margin: 1em;
-    display: inline-block;
+.x-scraper#title-div {
+	margin-bottom: 5%;
+	font-size: x-large;
 }
 
-button.x-scraper,
+.x-scraper#scrape-ui-container {
+	margin: 1em;
+	font-weight: normal;
+	font-size: small;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+label.x-scraper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0.5em;
+}
+
+input.x-scraper#max-tweets-input {
+	border: none;
+	background-color: #f2f2f2;
+	color: #041f4a;
+	margin: 1em;
+	border-radius: 4px;
+	height: 32px;
+	width: 8em;
+	padding-left: 1em;
+	display: flex;
+}
+
+input.x-scraper#max-tweets-input:focus-visible {
+	outline: solid 0.5px gray;
+}
+
+input.x-scraper[type='checkbox'] {
+	margin: 1em;
+	display: flex;
+}
+
+/* button.x-scraper,
 select.x-scraper {
-    border: 1px solid;
-    border-color: #e0e0e0;
-    border-radius: 4px;
-    height: 32px;
-    width: auto;
-    color: #4285f4;
-    border-color: #4285f4;
-    background-color: white;
-    text-align: center;
-    font-weight: 500;
-    font-family: system-ui, sans-serif;
-    margin: 1em;
-    padding: 2px 5px;
-    display: inline-block;
-}
+	border: 1px solid;
+	border-color: #e0e0e0;
+	border-radius: 4px;
+	height: 32px;
+	width: auto;
+	color: #4285f4;
+	border-color: #4285f4;
+	background-color: white;
+	text-align: center;
+	font-weight: 500;
+	font-family: system-ui, sans-serif;
+	margin: 1em;
+	padding: 2px 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+} */
 
 select.x-scraper:focus-visible,
 button.x-scraper:focus-visible {
-    outline: none;
+	outline: none;
 }
 
-button.x-scraper:hover,
+/* button.x-scraper:hover,
 select.x-scraper:hover {
-    border-color: #bbdefb;
-    background-color: rgba(33, 150, 243, 0.04);
-    cursor: pointer;
-}
+	border-color: #bbdefb;
+	background-color: rgba(33, 150, 243, 0.04);
+	cursor: pointer;
+} */
 
 button.x-scraper:active {
-    border: 2px solid;
+	border: 2px solid;
 }
 
-#stop-button {
-    color: #ff0000;
-    border-color: #ff0000;
-    display: none;
+.x-scraper#stop-button {
+	color: #cc0000;
+	border-color: #cc0000;
+	display: none;
 }
 
-#stop-button:hover {
-    border-color: #ff8080;
-    background-color: #ffe6e6;
-    cursor: pointer;
+.x-scraper#stop-button:hover {
+	border-color: red;
+	background-color: #ffe6e6;
+	cursor: pointer;
 }
 
-#reset-div {
-    margin-top: 5%;
-    display: none;
+.x-scraper#reset-div {
+	margin-top: 5%;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
-#close-button {
-    float: right;
-    color: #ff0000;
-    cursor: pointer;
-    font-size: larger;
-    font-weight: bold;
-    border: none;
-    background: none;
-}
-#close-button:hover, #close-button:focus {
-    color: #ff6666;
+.x-scraper#reset-button-div {
+	display: flex;
+	justify-content: center;
+	width: 100%;
 }
 
-#download-div {
-    margin-top: 5%;
+.x-scraper#close-button {
+	display: flex;
+	align-self: flex-end;
+	color: #cc0000;
+	cursor: pointer;
+	font-size: larger;
+	font-weight: bold;
+	border: none;
+	background: none;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+}
+.x-scraper#close-button:hover,
+.x-scraper#close-button:focus {
+	color: red;
 }
 
-#dl-result {
-    height: 1em;
+/* .x-scraper#download-div {
+	margin-top: 5%;
 }
 
-#download-button {
-    display: none;
+.x-scraper#dl-result {
+	height: 1em;
+}
+
+.x-scraper#download-button {
+	display: none;
+} */
+
+/* dialog.x-scraper dialog { */
+dialog.dl-ui {
+	width: 50%;
+	height: 80vh;
+	border: none;
+	border-radius: 5px;
+	box-shadow: 0 0 10px 0 #aaa;
+}
+
+dialog.dl-ui div.close-btn {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	cursor: pointer;
+}
+
+dialog.dl-ui div#dl-container {
+	height: 90%;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+}
+
+dialog.dl-ui div#keys-container {
+	height: 90%;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #eee;
+	margin: 10px 0;
+	overflow-y: scroll;
+	text-align: left;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+}
+
+dialog.dl-ui span.arrow {
+	cursor: pointer;
+	margin-left: 0.5rem;
+	font-size: x-small;
+	color: #5448ee;
+}
+
+dialog.dl-ui div.nested-container {
+	overflow: hidden;
+	transition: height 0.3s ease;
+}
+
+dialog .dl-ui {
+	width: auto;
+	height: auto;
+	padding: 5px;
+	background-color: white;
+	border-radius: 5px;
+	font-size: medium;
+	font-weight: normal;
+	color: black;
+	display: inline-block;
+}
+
+label.dl-ui {
+	display: flex;
+	border: none;
+}
+
+select.dl-ui,
+button.dl-ui {
+	border: solid 1px black;
+	width: 7rem;
+}
+
+ul.dl-ui {
+	display: flex;
+	flex-direction: column;
+}
+
+li.dl-ui {
+	display: inline-block;
+}
+
+input.data-item {
+	margin-right: 5px;
 }

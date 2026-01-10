@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>𝕏-Scraper</title>
-        <link rel="stylesheet" type="text/css" href="popup.css" />
-        <script src="popup.js"></script>
-    </head>
+	<head>
+		<meta charset="UTF-8" />
+		<title>𝕏-Scraper</title>
+		<link rel="stylesheet" type="text/css" href="popup.css" />
+		<script src="popup.js"></script>
+	</head>
 
-    <body>
-        <h2 style="vertical-align: middle">𝕏-Scraper</h2>
-        <br />
-        <div id="grant-permissions" style="display: none">
-            <div>Grant access to twitter.com?</div>
-            <button id="grant-permissions">OK</button>
-        </div>
-        <div id="content-container">
-            <div id="error-msg" style="display: none">
-                Unsupported page:<br />perform an
-                <a href="https://x.com/search-advanced/" target="_blank"
-                    >𝕏/Twitter search</a
-                >
-                to scrape content
-            </div>
-            <div id="scrape-container" style="display: none">
-                <div id="input-container">
-                    <button id="scrapeButton">Start scraping</button>
-                </div>
-            </div>
-        </div>
-    </body>
+	<body>
+		<div class="header">
+			<div class="title">𝕏-Scraper</div>
+			<div id="version_div"></div>
+		</div>
+		<br />
+		<div id="grant-permissions" style="display: none">
+			<div>Grant access to twitter.com?</div>
+			<button id="grant-permissions">OK</button>
+		</div>
+		<div id="content-container">
+			<div id="error-msg" style="display: none">
+				Unsupported page:<br />perform an
+				<a href="https://x.com/search-advanced/" target="_blank"
+					>𝕏/Twitter search</a
+				>
+				to scrape content
+			</div>
+			<div id="scrape-container" style="display: none">
+				<div id="input-container">
+					<button id="scrapeButton">Start</button>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

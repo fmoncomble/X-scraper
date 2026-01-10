@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<body>
+		<div id="modal" class="x-scraper">
+			<span id="close-button" class="x-scraper">&#10005;</span>
+			<div id="scrape-frame" class="x-scraper">
+				<div id="title-div" class="x-scraper">𝕏-Scraper</div>
+				<div id="scrape-ui-container" class="x-scraper">
+					<div id="rate-limit-notice" class="x-scraper"></div>
+					<label for="max-tweets-input" class="x-scraper"
+						>Max tweets:
+						<input
+							type="number"
+							id="max-tweets-input"
+							name="max-tweets-input"
+							class="x-scraper" />
+					</label>
+					<div id="button-div" class="x-scraper">
+						<button id="scrape-button" class="x-scraper">
+							Start Scraping
+						</button>
+						<button id="stop-button" class="x-scraper">Stop</button>
+					</div>
+					<div id="process-container" class="x-scraper"></div>
+					<div id="reset-div" class="x-scraper">
+						<div id="reset-button-div" class="x-scraper">
+							<button id="extract-button" class="x-scraper">
+								Extract
+							</button>
+							<button id="reset-button" class="x-scraper">
+								Reset
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Download dialog -->
+		<dialog id="dl-dialog" class="x-scraper dl-ui">
+			<div class="close-btn x-scraper">❌</div>
+			<div id="dl-container" class="x-scraper">
+				<div
+					id="dl-title"
+					class="x-scraper"
+					style="display: flex; flex-direction: row; gap: 0.5rem">
+					<span id="post-count" class="x-scraper"></span>
+					<span>—</span><span>Select data to include:</span>
+				</div>
+				<div id="keys-container" class="x-scraper dl-ui"></div>
+			</div>
+			<div id="options-container" class="x-scraper dl-ui">
+				<div>
+					<label for="anonymize" class="x-scraper dl-ui">
+						<input
+							type="checkbox"
+							id="anonymize"
+							class="x-scraper dl-ui" />Anonymize posts</label
+					>
+				</div>
+				<div>
+					<select id="format-select" class="x-scraper dl-ui">
+						<option value="xml">XML/XTZ</option>
+						<option value="txt">TXT</option>
+						<option value="csv">CSV</option>
+						<option value="xlsx">XLSX</option>
+						<option value="json">JSON</option>
+					</select>
+					<button id="dl-confirm-btn" class="x-scraper dl-ui">
+						Download
+					</button>
+					<label for="table-checkbox" style="display: none">
+						<input id="table-checkbox" type="checkbox" checked />
+						Format as table
+					</label>
+				</div>
+			</div>
+		</dialog>
+	</body>
+</html>

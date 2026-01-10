@@ -1,47 +1,60 @@
 html {
-    border: none;
-    border-radius: 10px;
-    width: 272px;
+	border: none;
+	border-radius: 10px;
+	width: 272px;
 }
 
 body {
-    background-color: white;
-    text-align: center;
-    font-family: system-ui, sans-serif;
-    font-size: small;
-    width: 236px;
-    height: 150px;
-    padding: 10px;
+	background-color: white;
+	text-align: center;
+	font-family: 'Roboto', system-ui, sans-serif;
+	font-size: small;
+	width: 236px;
+	height: 150px;
+	padding: 10px;
+}
+
+.header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: start;
+	margin: 10px auto;
+}
+
+.title {
+	font-size: x-large;
+	font-weight: bold;
 }
 
 button {
-    border: 1px solid;
-    border-color: #e0e0e0;
-    border-radius: 4px;
-    height: 32px;
-    width: auto;
-    color: #4285f4;
-    background-color: white;
-    text-align: center;
-    font-weight: 500;
-    font-family: system-ui, sans-serif;
-    margin: 1em;
-}
-
-button:focus-visible {
-    outline: none;
+	border: 1px solid;
+	border-color: black;
+	border-radius: 4px;
+	height: auto;
+	width: 100px;
+	padding: 0.5rem;
+	color: white;
+	background-color: black;
+	text-align: center;
+	font-weight: bold;
+	font-family: system-ui, sans-serif;
+	margin: 1em;
+	cursor: pointer;
 }
 
 button:hover {
-    border-color: #bbdefb;
-    background-color: rgba(33, 150, 243, 0.04);
-    cursor: pointer;
+	background-color: #404040;
+}
+
+button:focus-visible {
+	outline: none;
 }
 
 button:active {
-    border: 2px solid;
+	border: 2px solid;
 }
 
 div#error-msg {
-    color: red;
+	color: #cc0000;
 }

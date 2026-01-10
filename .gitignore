@@ -1,3 +1,5 @@
 update_manifest.json
 old/
 Archive.zip
+.DS_Store
+scraper_tool/
