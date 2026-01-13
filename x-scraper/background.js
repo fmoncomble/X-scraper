@@ -1,94 +1,345 @@
-import { ClientTransaction } from './x-client-transaction-id/esm/mod.js';
-
-chrome.webRequest.onBeforeSendHeaders.addListener(
-    function (details) {
-        console.log('Details: ', details);
-        chrome.tabs.query(
-            { active: true, currentWindow: true },
-            function (tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                    message: 'request_headers',
-                    url: details.url,
-                    headers: details.requestHeaders,
-                });
-            }
-        );
-    },
-    { urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
-    ['requestHeaders']
-);
-
 chrome.webRequest.onHeadersReceived.addListener(
-    function (details) {
-        chrome.tabs.query(
-            { active: true, currentWindow: true },
-            function (tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                    message: 'response_headers',
-                    headers: details.responseHeaders,
-                });
-            }
-        );
-    },
-    { urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
-    ['responseHeaders']
+	function (details) {
+		chrome.tabs.query(
+			{ active: true, currentWindow: true },
+			function (tabs) {
+				chrome.tabs.sendMessage(tabs[0].id, {
+					message: 'response_headers',
+					headers: details.responseHeaders,
+				});
+			}
+		);
+	},
+	{ urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
+	['responseHeaders']
 );
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('Received request:', request);
-    if (request.action === 'get_transaction_id') {
-        let url = request.url;
-        getTransactionID(url, sendResponse);
-        return true;
-    }
-});
-async function getTransactionID(url, sendResponse) {
-    console.log('Fetching transaction ID...');
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            console.error(
-                'Failed to fetch:',
-                response.status,
-                response.statusText
-            );
-            sendResponse({ error: 'Failed to fetch the page' });
-            return;
-        }
+let scraping = false;
+let tweets = [];
+let port;
+let demand;
+let i = 1;
+chrome.runtime.onConnect.addListener(handlePort);
+async function handlePort(p) {
+	tweets = [];
+	port = p;
+	port.postMessage({ message: 'connected' });
+	const pingInterval = setInterval(() => {
+		if (port.sender) {
+			port.postMessage({ message: 'ping' });
+		} else {
+			console.error('No sender, clearing interval');
+			clearInterval(pingInterval);
+		}
+	}, 10000);
+	port.onDisconnect.addListener((p) => {
+		console.error('Port disconnected', p);
+		tweets = [];
+		scraping = false;
+		chrome.storage.local.remove(['tweets']);
+		chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+		chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+		clearInterval(pingInterval);
+	});
+	port.onMessage.addListener(async (request) => {
+		chrome.storage.local.get(['tweets'], function (result) {
+			if (result.tweets && result.tweets.length) {
+				tweets = result.tweets;
+			} else {
+				tweets = [];
+			}
+		});
+		i = 1;
+		demand = request;
+		if (request.message === 'get_first_results') {
+			console.log('Tweets at time of request:', request.message, tweets);
+			scraping = false;
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+			chrome.webRequest.onBeforeRequest.addListener(
+				firstListener,
+				{
+					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
+				},
+				['blocking']
+			);
+		} else if (request.message === 'scrape') {
+			console.log('Tweets at time of request:', request.message, tweets);
+			scraping = true;
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+			chrome.webRequest.onBeforeRequest.addListener(
+				scrapeListener,
+				{
+					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
+				},
+				['blocking']
+			);
+			port.postMessage({
+				message: 'scrape_started',
+			});
+		} else if (request.message === 'stop_scrape') {
+			console.log('Tweets at time of request:', request.message, tweets);
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+			port.postMessage({ message: 'scrape_stopped' });
+		} else if (request.message === 'abort') {
+			console.log('Tweets at time of request:', request.message, tweets);
+			scraping = false;
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			port.postMessage({ message: 'scrape_aborted' });
+		} else if (request.message === 'generateXlsx') {
+			const posts = request.posts;
+			const formatTable = request.formatTable || false;
+			if (posts && posts.length) {
+				generateXlsx(posts, formatTable, port);
+			}
+		}
+	});
+}
 
-        const html = await response.text();
-        const parser = new DOMParser();
-        const document = parser.parseFromString(html, 'text/html');
-        console.log('Document:', document);
+async function firstListener(details) {
+	if (scraping) return;
+	console.log('First listener called, request #', i);
+	i++;
+	scraping = false;
+	let filter = chrome.webRequest.filterResponseData(details.requestId);
+	let decoder = new TextDecoder('utf-8');
+	let str = '';
 
-        if (
-            !ClientTransaction ||
-            typeof ClientTransaction.create !== 'function'
-        ) {
-            console.error('ClientTransaction is not defined or invalid');
-            sendResponse({ error: 'ClientTransaction is not available' });
-            return;
-        }
+	filter.ondata = (event) => {
+		try {
+			const chunk = decoder.decode(event.data, { stream: true });
+			str += chunk;
+			filter.write(event.data);
+		} catch (e) {
+			console.error('Error decoding chunk:', e);
+			filter.disconnect();
+		}
+	};
 
-        const transaction = new ClientTransaction(document);
-        await transaction.initialize();
-        const transactionId = await transaction.generateTransactionId(
-            'GET',
-            '/1.1/jot/client_event.json'
-        );
-        console.log('Generated transaction ID:', transactionId);
+	filter.onstop = async () => {
+		try {
+			let json = JSON.parse(str);
+			if (!json) return;
+			let entries =
+				json.data?.search_by_raw_query?.search_timeline?.timeline?.instructions
+					?.filter((instr) => instr.type === 'TimelineAddEntries')
+					?.flatMap((instr) => instr.entries)
+					.filter((entry) => entry.entryId.startsWith('tweet')) || [];
+			if (!entries || !entries.length) return;
+			let processedEntries = await processTweets(entries);
+			console.log(
+				'Posting first_data with',
+				processedEntries.length,
+				'tweets'
+			);
+			port.postMessage({ message: 'first_data', data: processedEntries });
+			filter.disconnect();
+		} catch (e) {
+			console.error('Error: ', e);
+		} finally {
+			filter.disconnect();
+		}
+	};
 
-        if (transactionId) {
-            sendResponse({ transactionId: transactionId });
-        } else {
-            console.error('Failed to generate transaction ID');
-            sendResponse({ error: 'Failed to generate transaction ID' });
-        }
-    } catch (error) {
-        console.error('Error generating transaction ID:', error);
-        sendResponse({
-            error: 'Failed to generate transaction ID',
-            details: error.message,
-        });
-    }
+	return {};
+}
+
+async function scrapeListener(details) {
+	console.log('Scrape listener called, request #', i);
+	i++;
+	scraping = true;
+	let filter = chrome.webRequest.filterResponseData(details.requestId);
+	let decoder = new TextDecoder('utf-8');
+	let str = '';
+	if (tweets.length >= demand.limit) {
+		chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+		port.postMessage({
+			message: 'limit_reached',
+		});
+		return;
+	}
+
+	filter.ondata = (event) => {
+		try {
+			const chunk = decoder.decode(event.data, { stream: true });
+			str += chunk;
+			filter.write(event.data);
+		} catch (e) {
+			console.error('Error decoding chunk:', e);
+			filter.disconnect();
+		}
+	};
+
+	filter.onstop = async () => {
+		try {
+			let json = JSON.parse(str);
+			let entries =
+				json.data?.search_by_raw_query?.search_timeline?.timeline?.instructions
+					?.filter((instr) => instr.type === 'TimelineAddEntries')
+					?.flatMap((instr) => instr.entries)
+					.filter((entry) => entry.entryId.startsWith('tweet')) || [];
+			if (entries && entries.length) {
+				let processedEntries = await processTweets(entries);
+				tweets.push(...processedEntries);
+				console.log(
+					`Sending ${processedEntries.length} new tweets, total so far: ${tweets.length}`
+				);
+				port.postMessage({
+					message: 'progress',
+					progress: processedEntries,
+				});
+				if (tweets.length >= demand.limit) {
+					chrome.webRequest.onBeforeRequest.removeListener(
+						scrapeListener
+					);
+					filter.disconnect();
+					port.postMessage({
+						message: 'limit_reached',
+					});
+				}
+			} else {
+				chrome.webRequest.onBeforeRequest.removeListener(
+					scrapeListener
+				);
+				filter.disconnect();
+				port.postMessage({
+					message: 'no_more_data',
+				});
+			}
+		} catch (e) {
+			console.error('Error:', e);
+		} finally {
+			filter.disconnect();
+		}
+	};
+
+	return {};
+}
+
+async function processTweets(entries) {
+	let processedTweets = [];
+	for (let entry of entries) {
+		let tweetResult =
+			entry.content?.itemContent?.tweet_results?.result?.tweet ||
+			entry.content?.itemContent?.tweet_results?.result;
+		if (tweetResult) {
+			let tweet = {};
+			let userResult = tweetResult.core?.user_results?.result;
+			if (userResult) {
+				tweet.user = userResult;
+			}
+			tweet.id = tweetResult.rest_id;
+			for (let [key, value] of Object.entries(tweetResult.legacy || {})) {
+				tweet[key] = value;
+			}
+			tweet.created_at = new Date(tweet.created_at).toISOString();
+			if (tweetResult.note_tweet) {
+				if (
+					tweetResult.note_tweet.is_expandable &&
+					tweetResult.note_tweet.note_tweet_results
+				) {
+					let noteResult =
+						tweetResult.note_tweet.note_tweet_results.result;
+					if (noteResult) {
+						tweet.full_text = noteResult.text;
+					}
+				}
+			}
+			if (tweet.user && tweet.id) {
+				tweet.url = `https://x.com/${tweet.user.core.screen_name}/status/${tweet.id}`;
+			}
+			processedTweets.push(tweet);
+		}
+	}
+	return processedTweets;
+}
+async function generateXlsx(posts, formatTable, port) {
+	let widths = [];
+	Object.keys(posts[0]).forEach((key) => {
+		widths.push({ key: key, widths: [] });
+	});
+	for (let p of posts) {
+		for (let [key, value] of Object.entries(p)) {
+			if (value) {
+				let vString = value.toString();
+				widths
+					.find((w) => w.key === key)
+					.widths.push(key.length, vString.length);
+			}
+		}
+	}
+	widths = widths.map((w) => {
+		w.widths.sort((a, b) => b - a);
+		return w.widths[0];
+	});
+
+	const workbook = new ExcelJS.Workbook();
+	const worksheet = workbook.addWorksheet('X_scrape');
+	worksheet.columns = Object.keys(posts[0]).map((key) => {
+		return { header: key, key: key, width: widths.shift() };
+	});
+
+	const rows = [];
+	function isDate(value) {
+		const regexp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d{3}Z)?/;
+		return regexp.test(value);
+	}
+	for (let p of posts) {
+		let row = [];
+		for (let [key, value] of Object.entries(p)) {
+			if (isDate(value)) {
+				value = new Date(value);
+			} else if (key === 'url') {
+				value = {
+					text: value,
+					hyperlink: value,
+					tooltip: 'Link to tweet',
+				};
+			}
+			row.push(value);
+		}
+		rows.push(row);
+	}
+
+	if (formatTable) {
+		worksheet.addTable({
+			name: 'X_scrape',
+			ref: 'A1',
+			headerRow: true,
+			totalsRow: false,
+			style: {
+				theme: 'TableStyleMedium9',
+				showRowStripes: true,
+			},
+			columns: worksheet.columns.map((col) => ({
+				name: col.header,
+				filterButton: true,
+			})),
+			rows: rows,
+		});
+	} else {
+		worksheet.addRows(rows);
+	}
+	if (posts[0].hasOwnProperty('url')) {
+		const urlCol = worksheet.getColumn('url');
+		if (urlCol) {
+			urlCol.eachCell(function (cell) {
+				if (cell.value && cell.value.hyperlink) {
+					cell.style = {
+						font: {
+							color: { argb: 'ff0000ff' },
+							underline: true,
+						},
+					};
+				}
+			});
+		}
+	}
+	const buffer = await workbook.xlsx.writeBuffer();
+	const binaryBlob = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+	const url = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${binaryBlob}`;
+	port.postMessage({ success: true, url: url });
 }

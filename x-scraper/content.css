@@ -1,127 +1,280 @@
-#modal {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 10;
-    position: fixed;
-    display: none;
+.x-scraper,
+.dl-ui {
+	background-color: white;
+	color-scheme: light !important;
+	scrollbar-color: auto !important;
 }
 
-#scrape-frame {
-    border-radius: 10px;
-    background-color: white;
-    margin-top: 10%;
-    margin-left: 35%;
-    width: 30%;
-    padding: 2%;
-    color: black;
-    font-family: 'Roboto', system-ui, sans-serif;
-    font-weight: bold;
-    font-size: large;
-    text-align: center;
+dialog.x-scraper,
+dialog.dl-ui {
+	border: none;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	padding: 0;
+	width: auto;
+	height: auto;
+	margin: auto;
+	color: black;
+	background-color: rgba(256, 256, 256, 0.2);
 }
 
-#title-div {
-    margin-top: 10%;
-    margin-bottom: 5%;
-    font-size: x-large;
-}
-
-#scrape-ui-container {
-    margin: 1em;
-    font-weight: normal;
-    font-size: small;
-    text-align: center;
-}
-
-input#max-tweets-input {
-    border: none;
-    background-color: #f2f2f2;
-    color: #041f4a;
-    margin: 1em;
-    border-radius: 4px;
-    height: 32px;
-    width: 8em;
-    padding-left: 1em;
-    display: inline-block;
-}
-
-input#max-tweets-input:focus-visible {
-    outline: solid 0.5px gray;
-}
-
+select.x-sraper,
 button.x-scraper,
-select.x-scraper {
-    border: 1px solid;
-    border-color: #e0e0e0;
-    border-radius: 4px;
-    height: 32px;
-    width: auto;
-    color: #4285f4;
-    border-color: #4285f4;
-    background-color: white;
-    text-align: center;
-    font-weight: 500;
-    font-family: system-ui, sans-serif;
-    margin: 1em;
-    padding: 2px 5px;
-    display: inline-block;
+select.dl-ui,
+button.dl-ui {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	color: black;
+	border: solid 1px black;
+	background-color: white;
+	height: auto;
+	width: 7rem;
+	padding: 5px;
+	border-radius: 5px;
+	margin: 5px;
+	text-align: center;
+}
+
+button.x-scraper {
+	cursor: pointer;
+}
+
+input.x-scraper[type='checkbox'] {
+	margin: auto 2px;
+}
+
+.x-scraper#modal {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	background-color: transparent;
+}
+
+.x-scraper#scrape-frame {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	border-radius: 10px;
+	background-color: white;
+	width: 50%;
+	height: 40%;
+	padding: 2%;
+	color: black;
+	font-family: 'Roboto', system-ui, sans-serif;
+	font-weight: bold;
+	font-size: large;
+	text-align: center;
+}
+
+.x-scraper#title-div {
+	margin-bottom: 5%;
+	font-size: x-large;
+}
+
+.x-scraper#scrape-ui-container {
+	margin: 1em;
+	font-weight: normal;
+	font-size: small;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+label.x-scraper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0.5em;
+}
+
+input.x-scraper#max-tweets-input {
+	border: none;
+	background-color: #f2f2f2;
+	color: #041f4a;
+	margin: 1em;
+	border-radius: 4px;
+	height: 32px;
+	width: 8em;
+	padding-left: 1em;
+	display: flex;
+}
+
+input.x-scraper#max-tweets-input:focus-visible {
+	outline: solid 0.5px gray;
+}
+
+input.x-scraper[type='checkbox'] {
+	margin: 1em;
+	display: flex;
 }
 
 select.x-scraper:focus-visible,
 button.x-scraper:focus-visible {
-    outline: none;
-}
-
-button.x-scraper:hover,
-select.x-scraper:hover {
-    border-color: #bbdefb;
-    background-color: rgba(33, 150, 243, 0.04);
-    cursor: pointer;
+	outline: none;
 }
 
 button.x-scraper:active {
-    border: 2px solid;
+	border: 2px solid;
 }
 
-#stop-button {
-    color: #ff0000;
-    border-color: #ff0000;
-    display: none;
+.x-scraper#stop-button {
+	color: #cc0000;
+	border-color: #cc0000;
+	display: none;
 }
 
-#stop-button:hover {
-    border-color: #ff8080;
-    background-color: #ffe6e6;
-    cursor: pointer;
+.x-scraper#stop-button:hover {
+	border-color: red;
+	background-color: #ffe6e6;
+	cursor: pointer;
 }
 
-#reset-div {
-    margin-top: 5%;
-    display: none;
+.x-scraper#reset-div {
+	margin-top: 5%;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
-#close-button {
-    float: right;
-    color: #ff0000;
-    cursor: pointer;
-    font-size: larger;
-    font-weight: bold;
-    border: none;
-    background: none;
-}
-#close-button:hover, #close-button:focus {
-    color: #ff6666;
+.x-scraper#reset-button-div {
+	display: flex;
+	justify-content: center;
+	width: 100%;
 }
 
-#download-div {
-    margin-top: 5%;
+.x-scraper#close-button {
+	display: flex;
+	align-self: flex-end;
+	color: #cc0000;
+	cursor: pointer;
+	font-size: larger;
+	font-weight: bold;
+	border: none;
+	background: none;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+}
+.x-scraper#close-button:hover,
+.x-scraper#close-button:focus {
+	color: red;
 }
 
-#dl-result {
-    height: 1em;
+dialog.dl-ui div.close-btn {
+	position: absolute;
+	top: 0.5rem;
+	right: 1rem;
+	cursor: pointer;
 }
 
-#download-button {
-    display: none;
+dialog.dl-ui div#dl-container {
+	height: 100%;
+	padding: 0 1rem;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+dialog.dl-ui div#keys-container {
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	overflow-y: auto;
+	text-align: left;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+}
+
+dialog.dl-ui span.arrow {
+	cursor: pointer;
+	margin-left: 0.5rem;
+	font-size: x-small;
+	color: #5448ee;
+}
+
+dialog.dl-ui div.nested-container {
+	overflow: hidden;
+	transition: height 0.3s ease;
+}
+
+dialog.dl-ui {
+	width: 50%;
+	height: 90%;
+	border: none;
+	border-radius: 5px;
+}
+
+label.dl-ui {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	padding: 0;
+}
+
+select.dl-ui,
+button.dl-ui {
+	border: solid 1px black;
+	width: 7rem;
+}
+
+ul.dl-ui {
+	display: flex;
+	flex-direction: column;
+}
+
+li.dl-ui {
+	display: inline-block;
+	padding: 0.2rem 0;
+}
+
+input.data-item {
+	margin-right: 5px;
+}
+
+input.dl-ui[type='checkbox'] {
+	margin: auto 0.5rem;
+}
+
+div.dl-ui#dl-title {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5rem;
+	align-items: center;
+	justify-content: center;
+	margin: 1rem auto;
+}
+
+div.dl-ui#options-container {
+	margin: 1rem auto;
+}
+
+div.x-scraper.spinner {
+	display: none;
+	border: 4px solid #ccc;
+	border-top: 4px solid black;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }

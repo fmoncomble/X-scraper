@@ -1,33 +1,50 @@
 {
-    "manifest_version": 3,
-    "name": "𝕏-Scraper",
-    "version": "0.5.5",
-    "description": "A browser extension to scrape 𝕏/Twitter search results",
-    "homepage_url": "https://fmoncomble.github.io/X-scraper/",
-    "permissions": ["activeTab", "tabs", "webRequest", "cookies"],
-    "host_permissions": ["*://x.com/*"],
-    "content_scripts": [
-        {
-            "matches": ["*://twitter.com/*", "*://x.com/*"],
-            "js": ["content.js", "xlsx.full.min.js"],
-            "css": ["content.css"]
-        }
-    ],
-    "background": {
-        "page": "background.html"
-    },
-    "icons": {
-        "48": "icons/icon-48.png",
-        "96": "icons/icon-96.png"
-    },
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": "icons/icon-32.png"
-    },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "{04667ad6-ab44-44b4-a1a4-464491591fe4}",
-            "update_url": "https://github.com/fmoncomble/X-scraper/releases/latest/download/update_manifest.json"
-        }
-    }
+	"manifest_version": 3,
+	"name": "𝕏-Scraper",
+	"version": "0.7.3",
+	"description": "A browser extension to scrape 𝕏/Twitter search results",
+	"homepage_url": "https://fmoncomble.github.io/X-scraper/",
+	"permissions": [
+		"activeTab",
+		"tabs",
+		"webRequest",
+		"webRequestBlocking",
+		"webRequestFilterResponse",
+		"storage"
+	],
+	"host_permissions": ["*://x.com/*"],
+	"content_scripts": [
+		{
+			"matches": ["*://x.com/*"],
+			"js": ["content.js"],
+			"css": ["content.css"]
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["scrape_dialog.html"],
+			"matches": ["*://twitter.com/*", "*://x.com/*"]
+		}
+	],
+	"background": {
+		"service_worker": "background.js",
+		"scripts": ["background.js", "exceljs.min.js"]
+	},
+	"icons": {
+		"48": "icons/icon-48.png",
+		"96": "icons/icon-96.png"
+	},
+	"action": {
+		"default_popup": "popup.html",
+		"default_icon": "icons/icon-32.png"
+	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "{04667ad6-ab44-44b4-a1a4-464491591fe4}",
+			"update_url": "https://github.com/fmoncomble/X-scraper/releases/latest/download/update_manifest.json",
+			"data_collection_permissions": {
+				"required": ["none"]
+			}
+		}
+	}
 }
