@@ -30,7 +30,7 @@ Remember to pin the add-on to the toolbar.
     -   (Optional) Set the maximum number of tweets to scrape.
     -   You can stop at any time by clicking the `Stop` button or abort by closing the dialog.
     -   ⚠️ User requests to the 𝕏 server are rate-limited (50 requests — each returning 20 tweets — per 15 minutes). As of v0.5, the extension now handles your rate limit automatically: if the number of tweets you want to scrape exceeds your current allowance, or if you do not set a maximum number, requests are paced at a rate of one every 18 seconds. This allows for your rate limit to reset before it is exhausted, preventing the collection process from stalling.
--   When the scrape finishes, a new dialog appears to let you choose the data you want to keep.
+-   When the scrape finishes, a new dialog appears to let you choose the data you want to keep. By default, the author's username, the tweet's publication date (`created_at`), full text and URL are selected.
     -   (Optional) Tick the checkbox to anonymize the tweets: usernames will be replaced with unique identifiers of the form `user_#` and tweet URLs will not be included.
     -   Choose your preferred output format:
         -   `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
