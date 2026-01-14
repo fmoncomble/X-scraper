@@ -14,11 +14,11 @@ Moncomble, F. (2024). _𝕏-Scraper_ (Version 0.7) [JavaScript]. Arras, France :
 
 [![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/x-scraper.xpi)
 
-### Chrome/Edge
-
-[![available-chrome-web-store4321](https://github.com/fmoncomble/X-scraper/assets/59739627/c23ea0a7-0c42-452e-89c0-0772314acac2)](https://chromewebstore.google.com/detail/%F0%9D%95%8F-scraper/elhnicjnbaaikfofmgmnbfdoeihnpmjg)
-
 Pensez à épingler l'extension à la barre d'outils
+
+### ~~Chrome/Edge~~~
+
+Les navigateurs basés sur Chromium ne sont plus pris en charge.
 
 ## Mode d'emploi
 
