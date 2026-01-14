@@ -1,41 +1,60 @@
+let port;
 chrome.webRequest.onHeadersReceived.addListener(
 	function (details) {
-		chrome.tabs.query(
-			{ active: true, currentWindow: true },
-			function (tabs) {
-				chrome.tabs.sendMessage(tabs[0].id, {
-					message: 'response_headers',
-					headers: details.responseHeaders,
-				});
-			}
-		);
+		if (port) {
+			port.postMessage({
+				message: 'response_headers',
+				headers: details.responseHeaders,
+				status: details.statusCode,
+			});
+		}
 	},
 	{ urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
 	['responseHeaders']
 );
 
 let scraping = false;
-let scrapeData = [];
-chrome.storage.local.get('scrapeData').then((data) => {
-	if (data.scrapeData) {
-		scrapeData = data.scrapeData;
-	}
-});
+let tweets = [];
+let demand;
+let i = 1;
 chrome.runtime.onConnect.addListener(handlePort);
 async function handlePort(p) {
-	await chrome.storage.local.get('scrapeData').then((data) => {
-		if (data.scrapeData) {
-			scrapeData = data.scrapeData;
+	tweets = [];
+	port = p;
+	port.postMessage({ message: 'connected' });
+	const pingInterval = setInterval(() => {
+		if (port.sender) {
+			port.postMessage({ message: 'ping' });
+		} else {
+			console.error('No sender, clearing interval');
+			clearInterval(pingInterval);
 		}
-	});
-	const port = p;
+	}, 10000);
 	port.onDisconnect.addListener((p) => {
 		console.error('Port disconnected', p);
+		tweets = [];
+		scraping = false;
+		chrome.storage.local.remove(['tweets']);
+		chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+		chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+		clearInterval(pingInterval);
 	});
 	port.onMessage.addListener(async (request) => {
+		chrome.storage.local.get(['tweets'], function (result) {
+			if (result.tweets && result.tweets.length) {
+				tweets = result.tweets;
+			} else {
+				tweets = [];
+			}
+		});
+		i = 1;
+		demand = request;
 		if (request.message === 'get_first_results') {
+			scraping = false;
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
 			chrome.webRequest.onBeforeRequest.addListener(
-				(details) => firstListener(details, port, scraping, scrapeData),
+				firstListener,
 				{
 					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
 				},
@@ -44,41 +63,26 @@ async function handlePort(p) {
 		} else if (request.message === 'scrape') {
 			scraping = true;
 			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
 			chrome.webRequest.onBeforeRequest.addListener(
-				(details) =>
-					scrapeListener(
-						details,
-						port,
-						request,
-						scraping,
-						scrapeData
-					),
+				scrapeListener,
 				{
 					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
 				},
 				['blocking']
 			);
-			await chrome.storage.local.get('scrapeData').then((data) => {
-				if (data.scrapeData) {
-					scrapeData = data.scrapeData;
-				}
-			});
 			port.postMessage({
-				message: 'progress',
-				progress: scrapeData.length,
+				message: 'scrape_started',
 			});
-		} else if (
-			request.message === 'stop_scrape' ||
-			request.message === 'abort'
-		) {
+		} else if (request.message === 'stop_scrape') {
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
 			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
-			await chrome.storage.local.get('scrapeData').then((data) => {
-				if (data.scrapeData) {
-					scrapeData = data.scrapeData;
-				}
-			});
-			let tweets = await processTweets(scrapeData);
-			port.postMessage({ message: 'scrape_stopped', data: tweets });
+			port.postMessage({ message: 'scrape_stopped' });
+		} else if (request.message === 'abort') {
+			scraping = false;
+			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
+			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
+			port.postMessage({ message: 'scrape_aborted' });
 		} else if (request.message === 'generateXlsx') {
 			const posts = request.posts;
 			const formatTable = request.formatTable || false;
@@ -89,11 +93,10 @@ async function handlePort(p) {
 	});
 }
 
-async function firstListener(details, port, scraping, scrapeData) {
+async function firstListener(details) {
 	if (scraping) return;
+	i++;
 	scraping = false;
-	scrapeData = [];
-	chrome.storage.local.set({ scrapeData: scrapeData });
 	let filter = chrome.webRequest.filterResponseData(details.requestId);
 	let decoder = new TextDecoder('utf-8');
 	let str = '';
@@ -112,15 +115,15 @@ async function firstListener(details, port, scraping, scrapeData) {
 	filter.onstop = async () => {
 		try {
 			let json = JSON.parse(str);
+			if (!json) return;
 			let entries =
 				json.data?.search_by_raw_query?.search_timeline?.timeline?.instructions
 					?.filter((instr) => instr.type === 'TimelineAddEntries')
 					?.flatMap((instr) => instr.entries)
 					.filter((entry) => entry.entryId.startsWith('tweet')) || [];
-			let tweets = await processTweets(entries);
-			scrapeData = tweets;
-			chrome.storage.local.set({ scrapeData: scrapeData });
-			port.postMessage({ message: 'first_data', data: scrapeData });
+			if (!entries || !entries.length) return;
+			let processedEntries = await processTweets(entries);
+			port.postMessage({ message: 'first_data', data: processedEntries });
 			filter.disconnect();
 		} catch (e) {
 			console.error('Error: ', e);
@@ -132,21 +135,16 @@ async function firstListener(details, port, scraping, scrapeData) {
 	return {};
 }
 
-async function scrapeListener(details, port, request, scraping, scrapeData) {
+async function scrapeListener(details) {
+	i++;
+	scraping = true;
 	let filter = chrome.webRequest.filterResponseData(details.requestId);
 	let decoder = new TextDecoder('utf-8');
 	let str = '';
-	await chrome.storage.local.get('scrapeData').then((data) => {
-		if (data.scrapeData) {
-			scrapeData = data.scrapeData;
-		}
-	});
-	if (scrapeData.length >= request.limit) {
+	if (tweets.length >= demand.limit) {
 		chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
-		let tweets = await processTweets(scrapeData.slice(0, request.limit));
 		port.postMessage({
-			message: 'scraped_data',
-			data: tweets,
+			message: 'limit_reached',
 		});
 		return;
 	}
@@ -171,21 +169,19 @@ async function scrapeListener(details, port, request, scraping, scrapeData) {
 					?.flatMap((instr) => instr.entries)
 					.filter((entry) => entry.entryId.startsWith('tweet')) || [];
 			if (entries && entries.length) {
-				let tweets = await processTweets(entries);
-				scrapeData.push(...tweets);
-				chrome.storage.local.set({ scrapeData: scrapeData });
+				let processedEntries = await processTweets(entries);
+				tweets.push(...processedEntries);
 				port.postMessage({
 					message: 'progress',
-					progress: scrapeData.length,
+					progress: processedEntries,
 				});
-				if (scrapeData.length >= request.limit) {
+				if (tweets.length >= demand.limit) {
 					chrome.webRequest.onBeforeRequest.removeListener(
 						scrapeListener
 					);
 					filter.disconnect();
 					port.postMessage({
-						message: 'scraped_data',
-						data: scrapeData,
+						message: 'limit_reached',
 					});
 				}
 			} else {
@@ -193,10 +189,8 @@ async function scrapeListener(details, port, request, scraping, scrapeData) {
 					scrapeListener
 				);
 				filter.disconnect();
-				let tweets = await processTweets(scrapeData);
 				port.postMessage({
-					message: 'scraped_data',
-					data: tweets,
+					message: 'no_more_data',
 				});
 			}
 		} catch (e) {
@@ -209,9 +203,9 @@ async function scrapeListener(details, port, request, scraping, scrapeData) {
 	return {};
 }
 
-async function processTweets(scrapeData) {
-	let tweets = [];
-	for (let entry of scrapeData) {
+async function processTweets(entries) {
+	let processedTweets = [];
+	for (let entry of entries) {
 		let tweetResult =
 			entry.content?.itemContent?.tweet_results?.result?.tweet ||
 			entry.content?.itemContent?.tweet_results?.result;
@@ -241,10 +235,10 @@ async function processTweets(scrapeData) {
 			if (tweet.user && tweet.id) {
 				tweet.url = `https://x.com/${tweet.user.core.screen_name}/status/${tweet.id}`;
 			}
-			tweets.push(tweet);
+			processedTweets.push(tweet);
 		}
 	}
-	return tweets;
+	return processedTweets;
 }
 async function generateXlsx(posts, formatTable, port) {
 	let widths = [];

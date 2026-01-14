@@ -1,26 +1,22 @@
 console.log('X-Scraper content script injected');
 
 let i = 1;
-let tweetCount = 0;
-let file;
 let abort = false;
-let cursor;
-let firstData;
-let scrapeData = [];
-let newData = false;
-let results = [];
-let csvData;
+let stopped = false;
+let tweets = [];
 let rateLimitRemaining;
 let rateReset;
-let scrapeStarted = false;
+let timeToReset;
+let statusCode;
+let now;
+let idleTime = 1000;
+let scraped = false;
+let query = window.location.search || '';
 
-chrome.storage.local.set({ scrapeData: scrapeData });
+chrome.storage.local.set({ tweets: tweets });
 
-chrome.runtime.onMessage.addListener(async function getResponseHeaders(
-	message,
-	sender,
-	sendResponse
-) {
+let port = chrome.runtime.connect({ name: 'x-scraper-port' });
+port.onMessage.addListener((message) => {
 	if (message.message === 'response_headers') {
 		let rateLimitRemainingObj = message.headers.find((h) => {
 			return h.name === 'x-rate-limit-remaining';
@@ -30,37 +26,72 @@ chrome.runtime.onMessage.addListener(async function getResponseHeaders(
 			return h.name === 'x-rate-limit-reset';
 		});
 		rateReset = rateResetObj.value;
+		timeToReset = rateReset * 1000 - Date.now();
+		let responseTime = message.headers.find((h) => {
+			return h.name === 'x-response-time';
+		}).value;
+		responseTime > 1000 ? (idleTime = responseTime) : (idleTime = 1000);
+		statusCode = message.status;
 	}
-});
-
-let port = chrome.runtime.connect({ name: 'x-scraper-port' });
-port.onMessage.addListener((message) => {
 	if (message.message === 'first_data') {
-		firstData = message.data;
+		let newQuery = window.location.search || '';
+		if (newQuery !== query) {
+			tweets = message.data;
+			query = newQuery;
+			scraped = false;
+		} else {
+			tweets.push(...message.data);
+		}
+		chrome.storage.local.set({ tweets: tweets });
+	}
+	if (message.message === 'ping') {
+		port.postMessage({ message: 'pong' });
 	}
 });
 port.onDisconnect.addListener((p) => {
 	console.error('Port disconnected', p);
+	port = chrome.runtime.connect({ name: 'x-scraper-port' });
 });
 port.postMessage({ message: 'get_first_results' });
 
 async function launchUI() {
-	const dialog = document.createElement('dialog');
-	dialog.classList.add('x-scraper');
-	const dialogHtmlUrl = chrome.runtime.getURL('scrape_dialog.html');
-	const dialogRes = await fetch(dialogHtmlUrl);
-	if (!dialogRes.ok) {
-		console.error('Failed to load dialog HTML:');
+	if (!tweets || !tweets.length) {
+		tweets = await chrome.storage.local.get('tweets').then((result) => {
+			return result.tweets || [];
+		});
+	}
+	if (!tweets || !tweets.length) {
+		window.alert(
+			'Failed to scrape first tweets. Reload the page and try again.'
+		);
+		window.location.reload();
 		return;
 	}
-	const dialogHtml = await dialogRes.text();
-	dialog.innerHTML = dialogHtml;
-	document.body.appendChild(dialog);
+	let dialog = document.querySelector('dialog.x-scraper');
+	if (!dialog) {
+		dialog = document.createElement('dialog');
+		dialog.classList.add('x-scraper');
+		const dialogHtmlUrl = chrome.runtime.getURL('scrape_dialog.html');
+		const dialogRes = await fetch(dialogHtmlUrl);
+		if (!dialogRes.ok) {
+			console.error('Failed to load dialog HTML:');
+			return;
+		}
+		const dialogHtml = await dialogRes.text();
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(dialogHtml, 'text/html');
+		const scrapeUI = doc.body.firstElementChild;
+		const downloadUI = scrapeUI.nextElementSibling;
+		const spinner = downloadUI.nextElementSibling;
+		dialog.appendChild(scrapeUI);
+		dialog.appendChild(downloadUI);
+		dialog.appendChild(spinner);
+		document.body.appendChild(dialog);
+	}
 	dialog.showModal();
 
 	const modal = dialog.querySelector('div#modal');
 	const closeButton = dialog.querySelector('span#close-button');
-	const scrapeUIContainer = dialog.querySelector('div#scrape-ui-container');
 	const rateLimitNotice = dialog.querySelector('div#rate-limit-notice');
 	const maxTweetsInput = dialog.querySelector('input#max-tweets-input');
 	const maxTweetsInputLabel = dialog.querySelector('label');
@@ -68,126 +99,85 @@ async function launchUI() {
 	const stopButton = dialog.querySelector('button#stop-button');
 	const processContainer = dialog.querySelector('div#process-container');
 	const resetDiv = dialog.querySelector('div#reset-div');
-	const resetMsg = dialog.querySelector('div#reset-msg');
 	const extractButton = dialog.querySelector('button#extract-button');
 	const resetButton = dialog.querySelector('button#reset-button');
 	const dlDialog = dialog.querySelector('#dl-dialog');
 	const anonymizeCheckbox = dialog.querySelector('input#anonymize');
 	const formatSelect = dialog.querySelector('#format-select');
 	const dlConfirmBtn = dialog.querySelector('#dl-confirm-btn');
+	const spinner = dialog.querySelector('.spinner.x-scraper');
 
-	if (rateLimitNotice.textContent === '') {
-		let resetTime = new Date(rateReset * 1000);
-		let now = new Date();
-		let timeToReset = resetTime - now;
-		let minutes = Math.floor((timeToReset % 3600000) / 60000);
-		let seconds = Math.floor((timeToReset % 60000) / 1000);
-		if (rateLimitRemaining > 0) {
-			rateLimitNotice.innerHTML = `You have ${rateLimitRemaining} requests left:<br/>to avoid exceeding your rate limit, scraping more than ${
-				rateLimitRemaining * 20
-			} tweets will proceed at a rate of 20 tweets every 18 seconds.<br/>Rate limit resets at ${resetTime.toLocaleTimeString()}.`;
-		} else {
-			rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${seconds} seconds`;
-			for (
-				let seconds = Math.floor(timeToReset / 1000);
-				seconds >= 0;
-				seconds--
-			) {
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				if (seconds === 0) {
-					window.location.reload();
-				} else {
-					let minutes = Math.floor((seconds % 3600) / 60);
-					let secs = Math.floor(seconds % 60);
-					rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${secs} seconds`;
-				}
+	if (scraped && tweets && tweets.length) {
+		processContainer.textContent = `Scraped ${tweets.length} tweet(s).`;
+		scrapeButton.textContent = 'Resume';
+	} else {
+		processContainer.textContent = null;
+		scrapeButton.textContent = 'Start Scraping';
+	}
+
+	rateLimitNotice.style.display = 'flex';
+
+	let timeToReset = rateReset * 1000 - Date.now();
+	let resetTime = new Date(rateReset * 1000);
+	let minutes = Math.floor((timeToReset % 3600000) / 60000);
+	let seconds = Math.floor((timeToReset % 60000) / 1000);
+	if (rateLimitRemaining > 0) {
+		rateLimitNotice.textContent = `Your are currently limited to ${rateLimitRemaining} request(s) by the 𝕏 API: to avoid blocking, scrolling will be staggered by several seconds if you scrape more than ${
+			rateLimitRemaining * 20
+		} tweets.\nYour rate limit will be restored to 50 requests at ${resetTime.toLocaleTimeString()}.`;
+	} else {
+		rateLimitNotice.textContent = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${seconds} seconds`;
+		scrapeButton.disabled = true;
+		for (
+			let seconds = Math.floor(timeToReset / 1000);
+			seconds >= 0;
+			seconds--
+		) {
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			if (seconds === 0) {
+				window.location.reload();
+			} else {
+				let minutes = Math.floor((seconds % 3600) / 60);
+				let secs = Math.floor(seconds % 60);
+				rateLimitNotice.textContent = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${secs} seconds`;
 			}
 		}
 	}
 
 	let maxTweets;
-	maxTweetsInput.addEventListener('change', () => {
-		maxTweets = maxTweetsInput.value;
-	});
-
-	async function resetInterface() {
-		abort = false;
-		results = [];
-		cursor = null;
-		i = 1;
-		tweetCount = 0;
-		scrapeButton.removeAttribute('style');
-		stopButton.removeAttribute('style');
-		downloadButton.removeAttribute('style');
-		maxTweetsInput.value = '';
-		maxTweets = null;
-		maxTweetsInput.removeAttribute('style');
-		maxTweetsInputLabel.removeAttribute('style');
-		fileFormat = 'xml';
-		downloadButton.textContent = 'Download ' + fileFormat.toUpperCase();
-		processContainer.textContent = '';
-		downloadResult.textContent = '';
-		resetDiv.removeAttribute('style');
-		resetMsg.textContent =
-			'You can also resume or click "Reset" to start afresh';
-		extractButton.style.display = 'flex';
-		rateLimitNotice.style.display = 'flex';
-		if (rateLimitRemaining > 0) {
-			rateLimitNotice.innerHTML = `You have ${rateLimitRemaining} requests left:\nto avoid exceeding your rate limit, scraping more than ${
-				rateLimitRemaining * 20
-			} tweets will proceed at a rate of 20 tweets every 18 seconds`;
-		} else {
-			let resetTime = new Date(rateReset * 1000);
-			let now = new Date();
-			let timeToReset = resetTime - now;
-			let minutes = Math.floor((timeToReset % 3600000) / 60000);
-			let seconds = Math.floor((timeToReset % 60000) / 1000);
-			rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${seconds} seconds`;
-			for (
-				let seconds = Math.floor(timeToReset / 1000);
-				seconds >= 0;
-				seconds--
-			) {
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				if (seconds === 0) {
-					window.location.reload();
-				} else {
-					let minutes = Math.floor((seconds % 3600) / 60);
-					let secs = Math.floor(seconds % 60);
-					rateLimitNotice.innerHTML = `You have exhausted your rate limit:\ntry again in ${minutes} minutes and ${secs} seconds`;
-				}
-			}
+	maxTweetsInput.onkeydown = function (e) {
+		if (e.key === 'Enter') {
+			scrapeButton.click();
 		}
-	}
+	};
 
 	window.onclick = function (event) {
 		if (event.target == modal) {
 			closeButton.click();
 		}
 	};
-	closeButton.addEventListener('click', () => {
+	closeButton.onclick = () => {
+		scrapeButton.style.display = 'flex';
+		stopButton.style.display = 'none';
+		resetDiv.style.display = 'flex';
 		abort = true;
-		chrome.storage.local.set({ scrapeData: [] });
+		scraped = true;
 		dialog.close();
-		dialog.remove();
-	});
-	document.addEventListener('keydown', (event) => {
+		dlDialog.close();
+	};
+	document.onkeydown = (event) => {
 		if (event.key === 'Escape') {
 			closeButton.click();
 		}
-	});
+	};
 
-	stopButton.addEventListener('click', () => {
-		stopButton.style.display = 'none';
-		abort = true;
-	});
-
-	resetButton.addEventListener('click', () => {
-		chrome.storage.local.set({ scrapeData: [] });
+	resetButton.onclick = () => {
+		chrome.storage.local.set({ tweets: [] });
 		window.location.href = 'https://x.com/search-advanced';
-	});
+	};
 
-	scrapeButton.addEventListener('click', async () => {
+	scrapeButton.onclick = async () => {
+		resetDiv.style.display = 'none';
 		mode = 'default';
 		let message = '';
 		maxTweets = parseInt(maxTweetsInput.value);
@@ -197,7 +187,9 @@ async function launchUI() {
 		if (maxTweets === Infinity || maxTweets > rateLimitRemaining * 20) {
 			mode = 'rateLimit';
 			if (maxTweets === Infinity) {
-				message = `Given X's rate limit, scrolling will proceed at a rate of 20 tweets every 18 seconds. Do you want to proceed?`;
+				message = `Given X's rate limit, scrolling will start at a rate of 20 tweets every ${Math.ceil(
+					timeToReset / rateLimitRemaining / 1000
+				)} seconds. Do you want to proceed?`;
 			} else if (maxTweets > rateLimitRemaining * 20) {
 				let timeInSeconds = (maxTweets / 20) * 18;
 				if (timeInSeconds > 60) {
@@ -218,25 +210,28 @@ async function launchUI() {
 			}
 			let proceed = window.confirm(message);
 			if (!proceed) {
-				resetInterface();
 				return;
 			}
 		}
 
-		stopButton.style.display = 'block';
+		stopButton.style.display = 'flex';
 		scrapeButton.style.display = 'none';
 		await scrape();
-	});
+	};
 
-	extractButton.addEventListener('click', () => {
-		if (results && results.length) {
-			showOptions(results);
+	extractButton.onclick = () => {
+		const newSpinner = spinner.cloneNode(true);
+		newSpinner.style.display = 'flex';
+		extractButton.textContent = null;
+		extractButton.appendChild(newSpinner);
+		if (tweets && tweets.length) {
+			showOptions(tweets);
+			extractButton.textContent = 'Extract';
 		}
-	});
+	};
 
 	let element = [];
-
-	let iteration = 1;
+	let iteration = 0;
 	function observeMutations(iteration) {
 		element = [];
 		return new Promise((resolve) => {
@@ -247,7 +242,10 @@ async function launchUI() {
 					if (mutation.type === 'childList') {
 						const addedNodes = mutation.addedNodes;
 						if (addedNodes.length) {
-							mutationDetected = true;
+							addedNodes.forEach((node) => {
+								mutationDetected = true;
+								element.push(node);
+							});
 						}
 					}
 				}
@@ -257,7 +255,7 @@ async function launchUI() {
 					inactivityTimeout = setTimeout(() => {
 						observer.disconnect();
 						resolve(element);
-					}, 1000);
+					}, idleTime);
 				}
 			});
 
@@ -269,105 +267,221 @@ async function launchUI() {
 			let inactivityTimeout = setTimeout(() => {
 				observer.disconnect();
 				resolve(element);
-			}, 1000);
+			}, idleTime);
 		});
 	}
 	observeMutations(iteration);
 
 	async function scrape() {
-		rateLimitNotice.style.display = 'none';
-		abort = false;
-		let scrollDelay = 1000;
-		scrapeData = await chrome.storage.local
-			.get('scrapeData')
-			.then((result) => {
-				return result.scrapeData || [];
+		try {
+			iteration = 0;
+			if (!tweets || !tweets.length) {
+				window.alert(
+					'Failed to scrape first tweets. Reload the page and try again.'
+				);
+				window.location.reload();
+				return;
+			}
+			stopButton.onclick = () => {
+				const stopSpinner = spinner.cloneNode(true);
+				stopSpinner.classList.add('stop');
+				stopSpinner.style.display = 'flex';
+				stopButton.textContent = null;
+				stopButton.appendChild(stopSpinner);
+				rateLimitNotice.style.display = 'flex';
+				stopped = true;
+			};
+			rateLimitNotice.style.display = 'none';
+			abort = false;
+			stopped = false;
+			let scrollDelay = 1000;
+			let waitTime = 1000;
+			if (mode === 'rateLimit') {
+				scrollDelay = Math.ceil(timeToReset / rateLimitRemaining);
+			}
+			tweets = await chrome.storage.local.get('tweets').then((result) => {
+				return result.tweets || [];
 			});
-		results = scrapeData;
-		if (scrapeData.length >= maxTweets) {
-			results = scrapeData;
-			endScrape();
-			return;
-		}
-		processContainer.textContent = `Scraped ${scrapeData.length} tweet(s), scrolling...`;
-		port.postMessage({
-			message: 'scrape',
-			limit: maxTweets,
-		});
-		port.onMessage.addListener(async (message) => {
-			if (message.message === 'progress') {
-				if (message.progress >= maxTweets) {
-					endScrape();
-					return;
+			if (tweets.length >= maxTweets) {
+				port.postMessage({ message: 'stop_scrape' });
+				port.onMessage.removeListener(onMessage);
+				endScrape('Max tweets reached before start.');
+				return;
+			}
+			processContainer.textContent = `Scraped ${tweets.length} tweet(s), scrolling...`;
+			port.postMessage({
+				message: 'scrape',
+				limit: maxTweets,
+			});
+			port.onMessage.addListener(onMessage);
+			async function onMessage(message) {
+				if (message.message === 'response_headers') {
+					if (statusCode !== 200) {
+						port.postMessage({ message: 'stop_scrape' });
+						port.onMessage.removeListener(onMessage);
+						endScrape(
+							`Scrape stopped due to HTTP status ${statusCode}.`
+						);
+					}
 				}
-				if (abort) {
-					port.postMessage({ message: 'abort' });
-					endScrape();
-					return;
+				if (tweets.length >= maxTweets) {
+					port.onMessage.removeListener(onMessage);
+					endScrape('Max tweets reached.');
 				}
-				if (mode === 'rateLimit') {
-					for (let i = 18; i > 0; i--) {
-						if (!abort) {
-							await new Promise((resolve) =>
-								setTimeout(resolve, 1000)
-							);
-							processContainer.textContent = `Scraped ${message.progress} tweet(s), now waiting ${i}...`;
-						} else {
-							port.postMessage({ message: 'abort' });
-							endScrape();
+				if (message.message === 'scrape_started') {
+					processContainer.textContent = `Scraped ${tweets.length} tweet(s), scrolling...`;
+					await new Promise((resolve) =>
+						setTimeout(resolve, waitTime)
+					);
+					let mut = await scrollToNext();
+					if (!mut) {
+						port.postMessage({ message: 'stop_scrape' });
+						port.onMessage.removeListener(onMessage);
+						endScrape('No mutation observed after start.');
+					}
+				} else if (message.message === 'progress') {
+					if (message.progress.length >= maxTweets) {
+						port.onMessage.removeListener(onMessage);
+						endScrape('Progress exceeds max tweets.');
+						return;
+					}
+					tweets.push(...message.progress);
+					chrome.storage.local.set({ tweets: tweets });
+					if (abort) {
+						port.postMessage({ message: 'abort' });
+						processContainer.textContent = `Scraped ${tweets.length} tweet(s).`;
+						return;
+					}
+					if (stopped) {
+						port.postMessage({ message: 'stop_scrape' });
+						processContainer.textContent = `Scraped ${tweets.length} tweet(s).`;
+						endScrape('Scrape stopped by user l.331.');
+						return;
+					}
+					if (mode === 'rateLimit') {
+						scrollDelay =
+							Math.ceil(timeToReset / rateLimitRemaining / 1000) *
+							1000;
+						for (let i = scrollDelay / 1000; i > 0; i--) {
+							if (!abort && !stopped) {
+								await new Promise((resolve) =>
+									setTimeout(resolve, 1000)
+								);
+								processContainer.textContent = `Scraped ${tweets.length} tweet(s), now waiting ${i}...`;
+							} else {
+								if (abort) {
+									port.postMessage({ message: 'abort' });
+								} else if (stopped) {
+									port.postMessage({
+										message: 'stop_scrape',
+									});
+									endScrape('Scrape stopped by user l.352.');
+								}
+								port.onMessage.removeListener(onMessage);
+								return;
+							}
+						}
+					}
+					if (tweets.length >= maxTweets) {
+						port.onMessage.removeListener(onMessage);
+						endScrape('Max tweets reached after progress.');
+						return;
+					} else {
+						processContainer.textContent = `Scraped ${tweets.length} tweet(s), scrolling...`;
+						await new Promise((resolve) =>
+							setTimeout(resolve, waitTime)
+						);
+						let mut = await scrollToNext();
+						if (!mut) {
+							port.postMessage({ message: 'stop_scrape' });
+							port.onMessage.removeListener(onMessage);
+							endScrape('No mutation observed after progress.');
 							return;
 						}
 					}
-				}
-				processContainer.textContent = `Scraped ${message.progress} tweet(s), scrolling...`;
-				await new Promise((resolve) =>
-					setTimeout(resolve, scrollDelay)
-				);
-				await scrollToNext();
-			} else if (message.message === 'scraped_data') {
-				const scrapeData = message.data;
-				if (scrapeData && scrapeData.length) {
-					results.push(...scrapeData);
-					endScrape();
+				} else if (
+					message.message === 'scraped_data' ||
+					message.message === 'limit_reached'
+				) {
+					const scrapeData = message.data;
+					if (scrapeData && scrapeData.length) {
+						tweets.push(...scrapeData);
+						chrome.storage.local.set({ tweets: tweets });
+					}
+					port.onMessage.removeListener(onMessage);
+					endScrape(
+						'Received limit_reached or scraped_data from background.'
+					);
+					return;
+				} else if (message.message === 'scrape_stopped') {
+					const scrapeData = message.data;
+					if (scrapeData && scrapeData.length) {
+						tweets.push(...scrapeData);
+						chrome.storage.local.set({ tweets: tweets });
+					}
+					port.onMessage.removeListener(onMessage);
+					endScrape('Received scrape_stopped from background.');
+					return;
+				} else if (message.message === 'scrape_aborted') {
+					port.onMessage.removeListener(onMessage);
+					port.postMessage({ message: 'get_first_results' });
+					processContainer.textContent = `Scraped ${tweets.length} tweet(s).`;
+					return;
+				} else if (message.message === 'no_more_data') {
+					port.onMessage.removeListener(onMessage);
+					endScrape('Received no_more_data from background.');
 					return;
 				}
-			} else if (message.message === 'scrape_stopped') {
-				const scrapeData = message.data;
-				if (scrapeData && scrapeData.length) {
-					results.push(...scrapeData);
-				}
-				endScrape();
-				return;
 			}
-		});
+		} catch (error) {
+			console.error('Scrape error:', error);
+			window.alert('An error occurred. Please try again.');
+			return;
+		}
 		async function scrollToNext() {
-			try {
-				iteration++;
-				window.scrollTo(0, document.body.scrollHeight);
-				await observeMutations(iteration);
-				i++;
-			} catch (error) {
-				console.error(error);
-			}
+			return new Promise(async (resolve) => {
+				try {
+					window.scrollTo(
+						0,
+						document.documentElement.scrollHeight * 2
+					);
+					let mut = await observeMutations(iteration);
+					i++;
+					if (iteration > 0 && (!mut || !mut.length)) {
+						resolve(false);
+					} else {
+						iteration++;
+						resolve(true);
+					}
+				} catch (error) {
+					console.error(error);
+					resolve(false);
+				}
+			});
+		}
+
+		function endScrape(reason) {
+			tweets.splice(maxTweets);
+			processContainer.textContent = `Scraped ${tweets.length} tweet(s)`;
+			stopButton.style.display = 'none';
+			scrapeButton.style.display = 'flex';
+			scrapeButton.textContent = 'Resume';
+			resetDiv.style.display = 'flex';
+			showOptions(tweets);
+			stopButton.style.display = 'none';
+			stopButton.textContent = 'Stop';
+			scrapeButton.style.display = 'flex';
+			scrapeButton.textContent = 'Resume';
+			scraped = true;
+			port.postMessage({ message: 'get_first_results' });
 		}
 	}
 
-	function endScrape() {
-		results.splice(maxTweets);
-		rateLimitNotice.innerHTML = null;
-		processContainer.textContent = `Scraped ${results.length} tweet(s)`;
-		stopButton.style.display = 'none';
-		maxTweetsInputLabel.style.display = 'none';
-		maxTweetsInput.style.display = 'none';
-		resetDiv.style.display = 'flex';
-		showOptions(results);
-		chrome.storage.local.set({ scrapeData: [] });
-	}
 	// Show data options dialog
 	function getCheckedMetadata() {
 		return new Promise((resolve) => {
-			chrome.storage.local.get('XCheckedMetadata', (results) => {
-				resolve(results.XCheckedMetadata || []);
+			chrome.storage.local.get('XCheckedMetadata', (tweets) => {
+				resolve(tweets.XCheckedMetadata || []);
 			});
 		});
 	}
@@ -375,33 +489,44 @@ async function launchUI() {
 	let checkedMetadata = await getCheckedMetadata();
 
 	async function showOptions(statuses) {
-		const keyTree = await buildKeyTree(statuses);
-		const container = dlDialog.querySelector('#keys-container');
-		container.textContent = '';
-		generateListTree(keyTree, container);
-		const checkboxes = dlDialog.querySelectorAll(
-			'input[type="checkbox"].data-item'
-		);
-		checkboxes.forEach((checkbox) => {
-			updateParentCheckboxes(checkbox);
-			if (checkbox.checked || checkbox.indeterminate) {
-				const div = checkbox.closest('div.nested-container');
-				if (div) {
-					div.style.height = 'auto';
-					const arrow = div.closest('li').querySelector('span.arrow');
-					if (arrow) {
-						arrow.textContent = '[less]';
+		try {
+			Array.from(
+				dlDialog.querySelectorAll('input[type="checkbox"]')
+			).forEach((cb) => {
+				cb.checked = false;
+			});
+			const keyTree = await buildKeyTree(statuses);
+			const container = dlDialog.querySelector('#keys-container');
+			container.textContent = '';
+			generateListTree(keyTree, container);
+			const checkboxes = dlDialog.querySelectorAll(
+				'input[type="checkbox"].data-item'
+			);
+			checkboxes.forEach((checkbox) => {
+				updateParentCheckboxes(checkbox);
+				if (checkbox.checked || checkbox.indeterminate) {
+					const div = checkbox.closest('div.nested-container');
+					if (div) {
+						div.style.height = 'auto';
+						const arrow = div
+							.closest('li')
+							.querySelector('span.arrow');
+						if (arrow) {
+							arrow.textContent = '[less]';
+						}
 					}
 				}
-			}
-		});
-		const postCountSpan = dlDialog.querySelector('#post-count');
-		postCountSpan.textContent = `${statuses.length} post(s) extracted`;
-		const closeBtn = dlDialog.querySelector('.close-btn');
-		closeBtn.addEventListener('click', () => {
-			dlDialog.close();
-		});
-		dlDialog.showModal();
+			});
+			const postCountSpan = dlDialog.querySelector('#post-count');
+			postCountSpan.textContent = `${statuses.length} tweet(s) scraped`;
+			const closeBtn = dlDialog.querySelector('.close-btn');
+			closeBtn.onclick = () => {
+				dlDialog.close();
+			};
+			dlDialog.showModal();
+		} catch (error) {
+			console.error('Error showing options:', error);
+		}
 
 		async function buildKeyTree(records) {
 			let tree = {};
@@ -564,7 +689,7 @@ async function launchUI() {
 	}
 
 	let fileFormat = 'xml';
-	formatSelect.addEventListener('change', () => {
+	formatSelect.onchange = () => {
 		fileFormat = formatSelect.value;
 		if (fileFormat === 'xlsx') {
 			const tableFormat = dlDialog.querySelector(
@@ -581,10 +706,10 @@ async function launchUI() {
 				tableFormat.remove();
 			}
 		}
-	});
+	};
 
 	// Listen to anonymize checkbox
-	anonymizeCheckbox.addEventListener('change', () => {
+	anonymizeCheckbox.onchange = () => {
 		const authorHandleCheckbox = document.getElementById(
 			'user.core.screen_name'
 		);
@@ -598,11 +723,11 @@ async function launchUI() {
 			authorHandleCheckbox.disabled = false;
 			authorHandleCheckbox.nextElementSibling.textContent = 'screen_name';
 		}
-	});
+	};
 
 	// Listen to download button
-	dlConfirmBtn.addEventListener('click', async () => {
-		let posts = await buildData(results);
+	dlConfirmBtn.onclick = async () => {
+		let posts = await buildData(tweets);
 		if (fileFormat === 'json') {
 			downloadJson(posts);
 		} else if (fileFormat === 'csv') {
@@ -614,7 +739,7 @@ async function launchUI() {
 		} else if (fileFormat === 'xlsx') {
 			downloadXlsx(posts);
 		}
-	});
+	};
 
 	function getNestedValue(obj, keyPath) {
 		return keyPath.split('.').reduce((acc, key) => acc && acc[key], obj);
@@ -708,7 +833,6 @@ async function launchUI() {
 		spinner.style.display = 'inline-block';
 		let xml = '<Text>';
 		for (let p of posts) {
-			console.log('Generating XML for post:', p);
 			let postData = '<lb/>\n<post';
 			for (let [key, value] of Object.entries(p)) {
 				if (typeof value === 'string') {
@@ -792,7 +916,9 @@ async function launchUI() {
 		const manifestVersion = chrome.runtime.getManifest().manifest_version;
 		if (manifestVersion === 3) {
 			const tableCheckbox = dialog.querySelector('#table-checkbox');
-			port.onMessage.addListener((message) => {
+			// port.onMessage.addListener((message) => {
+			port.onMessage.addListener(receiveXlsx);
+			function receiveXlsx(message) {
 				if (message.success) {
 					const binaryUrl = message.url;
 					const binaryString = atob(binaryUrl.split(',')[1]);
@@ -809,10 +935,11 @@ async function launchUI() {
 					anchor.href = url;
 					anchor.download = 'X_scrape.xlsx';
 					anchor.click();
+					port.onMessage.removeListener(receiveXlsx);
 				} else {
 					console.error('Error generating XLSX:', message.error);
 				}
-			});
+			}
 			port.postMessage({
 				message: 'generateXlsx',
 				posts: posts,

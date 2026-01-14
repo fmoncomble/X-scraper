@@ -1,17 +1,36 @@
-dialog.x-scraper {
+.x-scraper,
+.dl-ui {
+	background-color: white;
+	color-scheme: light !important;
+	scrollbar-color: auto !important;
+}
+
+dialog.x-scraper,
+dialog.dl-ui {
 	border: none;
 	border-radius: 10px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	text-align: center;
 	padding: 0;
-	width: 70%;
+	width: auto;
 	height: auto;
 	margin: auto;
 	color: black;
+	background-color: rgba(256, 256, 256, 0.2);
+}
+
+div.x-scraper#rate-limit-notice {
+	max-width: 50%;
 }
 
 select.x-sraper,
-button.x-scraper {
+button.x-scraper,
+select.dl-ui,
+button.dl-ui {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 	color: black;
 	border: solid 1px black;
 	background-color: white;
@@ -21,6 +40,14 @@ button.x-scraper {
 	border-radius: 5px;
 	margin: 5px;
 	text-align: center;
+}
+
+button.x-scraper:disabled,
+button.dl-ui:disabled {
+	cursor: not-allowed;
+	border: solid 1px gray;
+	color: gray;
+	background-color: #f2f2f2;
 }
 
 button.x-scraper {
@@ -38,9 +65,11 @@ input.x-scraper[type='checkbox'] {
 	align-items: center;
 	justify-content: center;
 	position: relative;
+	background-color: transparent;
 }
 
 .x-scraper#scrape-frame {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -48,7 +77,7 @@ input.x-scraper[type='checkbox'] {
 	border-radius: 10px;
 	background-color: white;
 	width: 50%;
-	height: 40%;
+	height: auto;
 	padding: 2%;
 	color: black;
 	font-family: 'Roboto', system-ui, sans-serif;
@@ -99,37 +128,10 @@ input.x-scraper[type='checkbox'] {
 	display: flex;
 }
 
-/* button.x-scraper,
-select.x-scraper {
-	border: 1px solid;
-	border-color: #e0e0e0;
-	border-radius: 4px;
-	height: 32px;
-	width: auto;
-	color: #4285f4;
-	border-color: #4285f4;
-	background-color: white;
-	text-align: center;
-	font-weight: 500;
-	font-family: system-ui, sans-serif;
-	margin: 1em;
-	padding: 2px 5px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-} */
-
 select.x-scraper:focus-visible,
 button.x-scraper:focus-visible {
 	outline: none;
 }
-
-/* button.x-scraper:hover,
-select.x-scraper:hover {
-	border-color: #bbdefb;
-	background-color: rgba(33, 150, 243, 0.04);
-	cursor: pointer;
-} */
 
 button.x-scraper:active {
 	border: 2px solid;
@@ -179,52 +181,30 @@ button.x-scraper:active {
 	color: red;
 }
 
-/* .x-scraper#download-div {
-	margin-top: 5%;
-}
-
-.x-scraper#dl-result {
-	height: 1em;
-}
-
-.x-scraper#download-button {
-	display: none;
-} */
-
-/* dialog.x-scraper dialog { */
-dialog.dl-ui {
-	width: 50%;
-	height: 80vh;
-	border: none;
-	border-radius: 5px;
-	box-shadow: 0 0 10px 0 #aaa;
-}
-
 dialog.dl-ui div.close-btn {
 	position: absolute;
-	top: 5px;
-	right: 10px;
+	top: 0.5rem;
+	right: 1rem;
 	cursor: pointer;
 }
 
 dialog.dl-ui div#dl-container {
-	height: 90%;
-	padding: 1rem;
+	height: 100%;
+	padding: 0 1rem;
 	display: flex;
 	flex-direction: column;
+	position: relative;
 }
 
 dialog.dl-ui div#keys-container {
-	height: 90%;
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	background-color: #eee;
-	margin: 10px 0;
-	overflow-y: scroll;
+	overflow-y: auto;
 	text-align: left;
-	padding: 1rem;
+	padding: 0;
 	display: flex;
 	flex-direction: column;
+	padding: 1rem;
 }
 
 dialog.dl-ui span.arrow {
@@ -239,21 +219,20 @@ dialog.dl-ui div.nested-container {
 	transition: height 0.3s ease;
 }
 
-dialog .dl-ui {
-	width: auto;
-	height: auto;
-	padding: 5px;
-	background-color: white;
+dialog.dl-ui {
+	width: 50%;
+	height: 90%;
+	border: none;
 	border-radius: 5px;
-	font-size: medium;
-	font-weight: normal;
-	color: black;
-	display: inline-block;
 }
 
 label.dl-ui {
 	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 	border: none;
+	padding: 0;
 }
 
 select.dl-ui,
@@ -269,8 +248,50 @@ ul.dl-ui {
 
 li.dl-ui {
 	display: inline-block;
+	padding: 0.2rem 0;
 }
 
 input.data-item {
 	margin-right: 5px;
+}
+
+input.dl-ui[type='checkbox'] {
+	margin: auto 0.5rem;
+}
+
+div.dl-ui#dl-title {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5rem;
+	align-items: center;
+	justify-content: center;
+	margin: 1rem auto;
+}
+
+div.dl-ui#options-container {
+	margin: 1rem auto;
+}
+
+div.x-scraper.spinner {
+	display: none;
+	border: 4px solid #ccc;
+	border-top: 4px solid black;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	animation: spin 1s linear infinite;
+}
+
+div.x-scraper.spinner.stop {
+	border: 4px solid #ff9999;
+	border-top: 4px solid #cc0000;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }

@@ -2,8 +2,8 @@
 <html lang="en">
 	<body>
 		<div id="modal" class="x-scraper">
-			<span id="close-button" class="x-scraper">&#10005;</span>
 			<div id="scrape-frame" class="x-scraper">
+				<span id="close-button" class="x-scraper">❌</span>
 				<div id="title-div" class="x-scraper">𝕏-Scraper</div>
 				<div id="scrape-ui-container" class="x-scraper">
 					<div id="rate-limit-notice" class="x-scraper"></div>
@@ -36,44 +36,59 @@
 			</div>
 		</div>
 		<!-- Download dialog -->
-		<dialog id="dl-dialog" class="x-scraper dl-ui">
-			<div class="close-btn x-scraper">❌</div>
-			<div id="dl-container" class="x-scraper">
+		<dialog id="dl-dialog" class="dl-ui">
+			<div id="dl-container" class="dl-ui">
+				<div class="close-btn dl-ui">❌</div>
 				<div
 					id="dl-title"
-					class="x-scraper"
+					class="dl-ui"
 					style="display: flex; flex-direction: row; gap: 0.5rem">
-					<span id="post-count" class="x-scraper"></span>
+					<span id="post-count" class="dl-ui"></span>
 					<span>—</span><span>Select data to include:</span>
 				</div>
-				<div id="keys-container" class="x-scraper dl-ui"></div>
-			</div>
-			<div id="options-container" class="x-scraper dl-ui">
-				<div>
-					<label for="anonymize" class="x-scraper dl-ui">
-						<input
-							type="checkbox"
-							id="anonymize"
-							class="x-scraper dl-ui" />Anonymize posts</label
-					>
-				</div>
-				<div>
-					<select id="format-select" class="x-scraper dl-ui">
-						<option value="xml">XML/XTZ</option>
-						<option value="txt">TXT</option>
-						<option value="csv">CSV</option>
-						<option value="xlsx">XLSX</option>
-						<option value="json">JSON</option>
-					</select>
-					<button id="dl-confirm-btn" class="x-scraper dl-ui">
-						Download
-					</button>
-					<label for="table-checkbox" style="display: none">
-						<input id="table-checkbox" type="checkbox" checked />
-						Format as table
-					</label>
+				<div id="keys-container" class="dl-ui"></div>
+				<div id="options-container" class="dl-ui">
+					<div>
+						<label for="anonymize" class="dl-ui">
+							<input
+								type="checkbox"
+								id="anonymize"
+								class="dl-ui" />Anonymize tweets</label
+						>
+					</div>
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							gap: 0.2rem;
+						">
+						<div style="display: flex; flex-direction: row">
+							<select id="format-select" class="dl-ui">
+								<option value="xml">XML/XTZ</option>
+								<option value="txt">TXT</option>
+								<option value="csv">CSV</option>
+								<option value="xlsx">XLSX</option>
+								<option value="json">JSON</option>
+							</select>
+							<button id="dl-confirm-btn" class="dl-ui">
+								Download
+							</button>
+						</div>
+						<label
+							for="table-checkbox"
+							class="dl-ui"
+							style="display: none">
+							<input
+								id="table-checkbox"
+								type="checkbox"
+								class="dl-ui"
+								checked />
+							Format as table
+						</label>
+					</div>
 				</div>
 			</div>
 		</dialog>
+		<div class="x-scraper spinner"></div>
 	</body>
 </html>
