@@ -1,34 +1,30 @@
 {
-    "@context": "https://w3id.org/codemeta/3.0",
-    "type": "SoftwareSourceCode",
-    "applicationCategory": "Linguistics",
-    "author": [
-        {
-            "id": "_:author_1",
-            "type": "Person",
-            "affiliation": {
-                "type": "Organization",
-                "name": "Textes et Cultures, Université d'Artois, Arras, France"
-            },
-            "email": "florent.moncomble@univ-artois.fr",
-            "familyName": "Moncomble",
-            "givenName": "Florent"
-        }
-    ],
-    "codeRepository": "https://github.com/fmoncomble/X-scraper",
-    "dateCreated": "2024-04-14",
-    "dateModified": "2024-05-22",
-    "datePublished": "2024-04-16",
-    "description": "An extension for extracting and downloading tweets for text mining.",
-    "keywords": [
-        "X",
-        "Twitter",
-        "corpus"
-    ],
-    "license": "https://spdx.org/licenses/MPL-2.0",
-    "name": "X-Scraper",
-    "programmingLanguage": "JavaScript",
-    "relatedLink": "https://fmoncomble.github.io/X-scraper/",
-    "version": "0.4.3",
-    "issueTracker": "https://github.com/fmoncomble/X-scraper/issues"
+	"@context": "https://w3id.org/codemeta/3.0",
+	"type": "SoftwareSourceCode",
+	"applicationCategory": "Linguistics",
+	"author": [
+		{
+			"id": "_:author_1",
+			"type": "Person",
+			"affiliation": {
+				"type": "Organization",
+				"name": "Textes et Cultures, Université d'Artois, Arras, France"
+			},
+			"email": "florent.moncomble@univ-artois.fr",
+			"familyName": "Moncomble",
+			"givenName": "Florent"
+		}
+	],
+	"codeRepository": "https://github.com/fmoncomble/X-scraper",
+	"dateCreated": "2024-04-14",
+	"dateModified": "2026-01-14",
+	"datePublished": "2024-04-16",
+	"description": "An extension for extracting and downloading tweets for text mining.",
+	"keywords": ["X", "Twitter", "corpus"],
+	"license": "https://spdx.org/licenses/MPL-2.0",
+	"name": "X-Scraper",
+	"programmingLanguage": "JavaScript",
+	"relatedLink": "https://fmoncomble.github.io/X-scraper/",
+	"version": "0.7.3",
+	"issueTracker": "https://github.com/fmoncomble/X-scraper/issues"
 }
