@@ -1,14 +1,13 @@
+let port;
 chrome.webRequest.onHeadersReceived.addListener(
 	function (details) {
-		chrome.tabs.query(
-			{ active: true, currentWindow: true },
-			function (tabs) {
-				chrome.tabs.sendMessage(tabs[0].id, {
-					message: 'response_headers',
-					headers: details.responseHeaders,
-				});
-			}
-		);
+		if (port) {
+			port.postMessage({
+				message: 'response_headers',
+				headers: details.responseHeaders,
+				status: details.statusCode,
+			});
+		}
 	},
 	{ urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
 	['responseHeaders']
@@ -16,7 +15,6 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 let scraping = false;
 let tweets = [];
-let port;
 let demand;
 let i = 1;
 chrome.runtime.onConnect.addListener(handlePort);
@@ -52,7 +50,6 @@ async function handlePort(p) {
 		i = 1;
 		demand = request;
 		if (request.message === 'get_first_results') {
-			console.log('Tweets at time of request:', request.message, tweets);
 			scraping = false;
 			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
 			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
@@ -64,7 +61,6 @@ async function handlePort(p) {
 				['blocking']
 			);
 		} else if (request.message === 'scrape') {
-			console.log('Tweets at time of request:', request.message, tweets);
 			scraping = true;
 			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
 			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
@@ -79,12 +75,10 @@ async function handlePort(p) {
 				message: 'scrape_started',
 			});
 		} else if (request.message === 'stop_scrape') {
-			console.log('Tweets at time of request:', request.message, tweets);
 			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
 			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
 			port.postMessage({ message: 'scrape_stopped' });
 		} else if (request.message === 'abort') {
-			console.log('Tweets at time of request:', request.message, tweets);
 			scraping = false;
 			chrome.webRequest.onBeforeRequest.removeListener(scrapeListener);
 			chrome.webRequest.onBeforeRequest.removeListener(firstListener);
@@ -101,7 +95,6 @@ async function handlePort(p) {
 
 async function firstListener(details) {
 	if (scraping) return;
-	console.log('First listener called, request #', i);
 	i++;
 	scraping = false;
 	let filter = chrome.webRequest.filterResponseData(details.requestId);
@@ -130,11 +123,6 @@ async function firstListener(details) {
 					.filter((entry) => entry.entryId.startsWith('tweet')) || [];
 			if (!entries || !entries.length) return;
 			let processedEntries = await processTweets(entries);
-			console.log(
-				'Posting first_data with',
-				processedEntries.length,
-				'tweets'
-			);
 			port.postMessage({ message: 'first_data', data: processedEntries });
 			filter.disconnect();
 		} catch (e) {
@@ -148,7 +136,6 @@ async function firstListener(details) {
 }
 
 async function scrapeListener(details) {
-	console.log('Scrape listener called, request #', i);
 	i++;
 	scraping = true;
 	let filter = chrome.webRequest.filterResponseData(details.requestId);
@@ -184,9 +171,6 @@ async function scrapeListener(details) {
 			if (entries && entries.length) {
 				let processedEntries = await processTweets(entries);
 				tweets.push(...processedEntries);
-				console.log(
-					`Sending ${processedEntries.length} new tweets, total so far: ${tweets.length}`
-				);
 				port.postMessage({
 					message: 'progress',
 					progress: processedEntries,

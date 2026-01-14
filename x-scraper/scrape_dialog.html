@@ -53,20 +53,27 @@
 							<input
 								type="checkbox"
 								id="anonymize"
-								class="dl-ui" />Anonymize posts</label
+								class="dl-ui" />Anonymize tweets</label
 						>
 					</div>
-					<div style="display: flex">
-						<select id="format-select" class="dl-ui">
-							<option value="xml">XML/XTZ</option>
-							<option value="txt">TXT</option>
-							<option value="csv">CSV</option>
-							<option value="xlsx">XLSX</option>
-							<option value="json">JSON</option>
-						</select>
-						<button id="dl-confirm-btn" class="dl-ui">
-							Download
-						</button>
+					<div
+						style="
+							display: flex;
+							flex-direction: column;
+							gap: 0.2rem;
+						">
+						<div style="display: flex; flex-direction: row">
+							<select id="format-select" class="dl-ui">
+								<option value="xml">XML/XTZ</option>
+								<option value="txt">TXT</option>
+								<option value="csv">CSV</option>
+								<option value="xlsx">XLSX</option>
+								<option value="json">JSON</option>
+							</select>
+							<button id="dl-confirm-btn" class="dl-ui">
+								Download
+							</button>
+						</div>
 						<label
 							for="table-checkbox"
 							class="dl-ui"

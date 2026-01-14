@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// This function checks if the extension has the necessary permissions
 	async function checkPermissions() {
 		const permissionsToCheck = {
-			origins: ['*://twitter.com/*', '*://x.com/*'],
+			origins: ['*://x.com/*'],
 		};
 
 		const hasPermissions = await chrome.permissions.contains(
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// This function requests permissions
 	async function requestPermissions() {
 		const permissionsToRequest = {
-			origins: ['*://twitter.com/*', '*://x.com/*'],
+			origins: ['*://x.com/*'],
 		};
 
 		function onResponse(response) {

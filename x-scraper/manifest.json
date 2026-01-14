@@ -5,8 +5,8 @@
 	"description": "A browser extension to scrape 𝕏/Twitter search results",
 	"homepage_url": "https://fmoncomble.github.io/X-scraper/",
 	"permissions": [
-		"activeTab",
 		"tabs",
+		"activeTab",
 		"webRequest",
 		"webRequestBlocking",
 		"webRequestFilterResponse",
