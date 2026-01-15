@@ -16,7 +16,7 @@ Moncomble, F. (2024). _𝕏-Scraper_ (Version 0.7) [JavaScript]. Arras, France :
 
 Pensez à épingler l'extension à la barre d'outils
 
-### ~~Chrome/Edge~~~
+### ~~Chrome/Edge~~
 
 Les navigateurs basés sur Chromium ne sont plus pris en charge.
 
@@ -29,7 +29,7 @@ Les navigateurs basés sur Chromium ne sont plus pris en charge.
 -   L'interface apparait par-dessus la page web :
     -   (Facultatif) Définissez le nombre maximum de tweets à récupérer.
     -   Vous pouvez arrêter la collecte à tout moment en cliquant sur `Stop`, ou l'annuler en fermant l'interface.
-    -   ⚠️ Le nombre de requêtes utilisateur au serveur 𝕏 est plafonné à 50 par période de 15 minutes (chaque requête renvoyant 20 tweets maximum). À partir de la v0.5, l'extension gère ce plafond automatiquement : si le nombre de tweets souhaité dépasse votre limite actuelle, ou si vous ne réglez pas le nombre maximum de tweets à collecter, les requêtes sont espacées de 18 secondes. Cela permet au plafond d'être réinitialisé avant d'être atteint, et ainsi à la collecte de continuer sans interruption.
+    -   ⚠️ Le nombre de requêtes utilisateur au serveur 𝕏 est plafonné à 50 par période de 15 minutes (chaque requête renvoyant 20 tweets maximum). À partir de la v0.5, l'extension gère ce plafond automatiquement : si le nombre de tweets souhaité dépasse votre limite actuelle, ou si vous ne réglez pas le nombre maximum de tweets à collecter, les requêtes sont espacées de quelques secondes. Cela permet au plafond d'être réinitialisé avant d'être atteint, et ainsi à la collecte de continuer sans interruption.
 -   Une fois la collecte terminée, l'interface vous propose de choisir les données que vous souhaitez inclure dans le fichier final. Par défaut, le nom d'utilisateur, la date de publication (`created_at`), le texte et l'URL du tweet sont sélectionnés.
     -   (Facultatif) Cochez la case pour anonymiser les tweets : les noms d'utilisateur seront remplacés par des identifiants uniques du type `user_n` et les URLs des tweets ne seront pas incluses.
     -   Choisissez le format de sortie désiré :
