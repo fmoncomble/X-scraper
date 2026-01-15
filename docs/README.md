@@ -6,7 +6,7 @@ An extension for extracting and downloading tweets for text mining.
 
 If you use this extension for your research, please reference it as follows:
 
-Moncomble, F. (2025). _𝕏-Scraper_ (Version 0.7) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
+Moncomble, F. (2026). _𝕏-Scraper_ (Version 0.7) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/X-scraper/
 
 ## Installation
 
@@ -29,8 +29,8 @@ Chromium-based browsers are no longer supported.
 -   The interface appears as a layer over the current webpage:
     -   (Optional) Set the maximum number of tweets to scrape.
     -   You can stop at any time by clicking the `Stop` button or abort by closing the dialog.
-    -   ⚠️ User requests to the 𝕏 server are rate-limited (50 requests — each returning 20 tweets — per 15 minutes). As of v0.5, the extension now handles your rate limit automatically: if the number of tweets you want to scrape exceeds your current allowance, or if you do not set a maximum number, requests are paced at a rate of one every 18 seconds. This allows for your rate limit to reset before it is exhausted, preventing the collection process from stalling.
--   When the scrape finishes, a new dialog appears to let you choose the data you want to keep. By default, the author's username, the tweet's publication date (`created_at`), full text and URL are selected.
+    -   ⚠️ User requests to the 𝕏 server are rate-limited (50 requests — each returning 20 tweets — per 15 minutes). As of v0.5, the extension now handles your rate limit automatically: if the number of tweets you want to scrape exceeds your current allowance, or if you do not set a maximum number, requests are paced at a rate of one every few seconds. This allows for your rate limit to reset before it is exhausted, preventing the collection process from stalling.
+-   When the scrape finishes, a new dialog appears to let you choose the data you want to keep. By default, the author's `screen_name`, the tweet's publication date (`created_at`), full text and URL are selected.
     -   (Optional) Tick the checkbox to anonymize the tweets: usernames will be replaced with unique identifiers of the form `user_#` and tweet URLs will not be included.
     -   Choose your preferred output format:
         -   `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
