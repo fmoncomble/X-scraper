@@ -33,8 +33,9 @@ Les navigateurs basés sur Chromium ne sont plus pris en charge.
 -   Une fois la collecte terminée, l'interface vous propose de choisir les données que vous souhaitez inclure dans le fichier final. Par défaut, le nom d'utilisateur, la date de publication (`created_at`), le texte et l'URL du tweet sont sélectionnés.
     -   (Facultatif) Cochez la case pour anonymiser les tweets : les noms d'utilisateur seront remplacés par des identifiants uniques du type `user_n` et les URLs des tweets ne seront pas incluses.
     -   Choisissez le format de sortie désiré :
-        -   `XML/XTZ` pour un fichier XML à importer dans [SketchEngine](https://app.sketchengine.eu/) ou [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) (en utilisant le module `XML/TEI-Zero`).
+        -   `XML/XTZ (TXM)` pour un fichier XML à importer dans [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) (en utilisant le module `XML/TEI-Zero`).
             -   Lors de l'import, ouvrez la section "Plans textuels" et entrez `ref` dans le champ « Hors texte à éditer »
+        -   `XML (Sketch Engine)` pour un fichier XML à importer dans [Sketch Engine](https://app.sketchengine.eu/)
         -   `IRaMuTeQ` pour un fichier en texte brut formaté pour le logiciel [IRaMuTeQ](https://pratinaud.gitpages.huma-num.fr/iramuteq-website/)
         -   `TXT` pour du texte brut
         -   `CSV`

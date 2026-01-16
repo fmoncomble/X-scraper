@@ -752,6 +752,8 @@ async function launchUI() {
 			downloadXlsx(posts);
 		} else if (fileFormat === 'ira') {
 			downloadIra(posts);
+		} else if (fileFormat === 'ske') {
+			downloadSke(posts);
 		}
 	};
 
@@ -894,6 +896,49 @@ async function launchUI() {
 			xml += postData;
 		}
 		xml += `</Text>`;
+		const blob = new Blob([xml], { type: 'application/xml' });
+		const url = URL.createObjectURL(blob);
+		const anchor = document.createElement('a');
+		anchor.href = url;
+		anchor.download = 'X_scrape.xml';
+		spinner.remove();
+		dlConfirmBtn.textContent = 'Download';
+		anchor.click();
+	}
+
+	function downloadSke(posts) {
+		const spinner = document.createElement('span');
+		spinner.classList.add('spinner');
+		dlConfirmBtn.textContent = '';
+		dlConfirmBtn.appendChild(spinner);
+		spinner.style.display = 'inline-block';
+		let xml = '';
+		for (let p of posts) {
+			let postData = '<post';
+			for (let [key, value] of Object.entries(p)) {
+				if (typeof value === 'string') {
+					p[key] = value
+						.replaceAll(/&/g, '&amp;')
+						.replaceAll(/</g, '&lt;')
+						.replaceAll(/>/g, '&gt;')
+						.replaceAll(/"/g, '&quot;')
+						.replaceAll(/'/g, '&apos;')
+						.replaceAll(/\u00A0/g, ' ');
+				}
+				if (key.includes('-')) {
+					delete p[key];
+					key = key.replaceAll(/\W/g, '_');
+					p[key] = value;
+				}
+				if (key !== 'full_text') {
+					postData += ` ${key}="${p[key]}"`;
+				}
+			}
+			postData += '>';
+			postData += p['full_text'];
+			postData += '</post>\n\n';
+			xml += postData;
+		}
 		const blob = new Blob([xml], { type: 'application/xml' });
 		const url = URL.createObjectURL(blob);
 		const anchor = document.createElement('a');

@@ -235,10 +235,8 @@ label.dl-ui {
 	padding: 0;
 }
 
-select.dl-ui,
-button.dl-ui {
-	border: solid 1px black;
-	width: 7rem;
+select.dl-ui {
+	width: auto;
 }
 
 ul.dl-ui {
