@@ -706,6 +706,17 @@ async function launchUI() {
 				tableFormat.remove();
 			}
 		}
+		if (fileFormat === 'txt') {
+			const checkboxes = dlDialog.querySelectorAll(
+				'input[type="checkbox"].data-item'
+			);
+			checkboxes.forEach((checkbox) => {
+				if (checkbox.id !== 'full_text') {
+					checkbox.checked = false;
+					updateParentCheckboxes(checkbox);
+				}
+			});
+		}
 	};
 
 	// Listen to anonymize checkbox
@@ -727,6 +738,7 @@ async function launchUI() {
 
 	// Listen to download button
 	dlConfirmBtn.onclick = async () => {
+		fileFormat = formatSelect.value;
 		let posts = await buildData(tweets);
 		if (fileFormat === 'json') {
 			downloadJson(posts);
@@ -738,6 +750,8 @@ async function launchUI() {
 			downloadTxt(posts);
 		} else if (fileFormat === 'xlsx') {
 			downloadXlsx(posts);
+		} else if (fileFormat === 'ira') {
+			downloadIra(posts);
 		}
 	};
 
@@ -898,8 +912,41 @@ async function launchUI() {
 		spinner.style.display = 'inline-block';
 		let txt = '';
 		for (let p of posts) {
-			let postData = p['full_text'];
-			postData += '\n\n*******************************\n\n';
+			let postData = '';
+			for (let [key, value] of Object.entries(p)) {
+				if (key !== 'full_text') {
+					postData += `${key}: ${value}\n`;
+				}
+			}
+			postData += `\n\t${p['full_text']}\n`;
+			postData += '\n--------------------\n\n';
+			txt += postData;
+		}
+		const blob = new Blob([txt], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const anchor = document.createElement('a');
+		anchor.href = url;
+		anchor.download = 'X_scrape.txt';
+		spinner.remove();
+		dlConfirmBtn.textContent = 'Download';
+		anchor.click();
+	}
+
+	function downloadIra(posts) {
+		const spinner = document.createElement('span');
+		spinner.classList.add('spinner');
+		dlConfirmBtn.textContent = '';
+		dlConfirmBtn.appendChild(spinner);
+		spinner.style.display = 'inline-block';
+		let txt = '';
+		for (let p of posts) {
+			let postData = '**** ';
+			for (let [key, value] of Object.entries(p)) {
+				if (key !== 'full_text') {
+					postData += `*${key}_${value} `;
+				}
+			}
+			postData += `\n${p['full_text']}\n\n`;
 			txt += postData;
 		}
 		const blob = new Blob([txt], { type: 'text/plain' });
@@ -916,7 +963,6 @@ async function launchUI() {
 		const manifestVersion = chrome.runtime.getManifest().manifest_version;
 		if (manifestVersion === 3) {
 			const tableCheckbox = dialog.querySelector('#table-checkbox');
-			// port.onMessage.addListener((message) => {
 			port.onMessage.addListener(receiveXlsx);
 			function receiveXlsx(message) {
 				if (message.success) {

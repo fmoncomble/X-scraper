@@ -35,6 +35,7 @@ Chromium-based browsers are no longer supported.
     -   Choose your preferred output format:
         -   `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
             -   When initiating the import process, open the "Textual planes" section and type `ref` in the field labelled "Out of text to edit"
+        -   `IRaMuTeQ` for a plain text file formatted for [IRaMuTeQ](https://pratinaud.gitpages.huma-num.fr/iramuteq-website/) software
         -   `TXT` for plain text
         -   `CSV`
         -   `XLSX` (Excel spreadsheet)
