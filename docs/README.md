@@ -33,7 +33,7 @@ Chromium-based browsers are no longer supported.
 -   When the scrape finishes, a new dialog appears to let you choose the data you want to keep. By default, the author's `screen_name`, the tweet's publication date (`created_at`), full text and URL are selected.
     -   (Optional) Tick the checkbox to anonymize the tweets: usernames will be replaced with unique identifiers of the form `user_#` and tweet URLs will not be included.
     -   Choose your preferred output format:
-        -   `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
+        -   `XML/XTZ` for an XML file to import into [SketchEngine](https://app.sketchengine.eu/) or [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) (using the `XML/TEI-Zero` module)
             -   When initiating the import process, open the "Textual planes" section and type `ref` in the field labelled "Out of text to edit"
         -   `IRaMuTeQ` for a plain text file formatted for [IRaMuTeQ](https://pratinaud.gitpages.huma-num.fr/iramuteq-website/) software
         -   `TXT` for plain text
