@@ -1,4 +1,47 @@
 let port;
+
+const manifest = chrome.runtime.getManifest();
+const origins = manifest.host_permissions;
+async function checkPermissions() {
+	return new Promise(async (resolve) => {
+		console.log('Checking permissions: ', origins);
+		const hasPermissions = await chrome.permissions.contains({ origins });
+		if (!hasPermissions) {
+			resolve(false);
+		} else {
+			resolve(true);
+		}
+	});
+}
+chrome.action.onClicked.addListener(async (tab) => {
+	const granted = await chrome.permissions.request({ origins });
+	if (granted) {
+		if (!tab.url.includes('x.com/search?')) {
+			if (tab.url.includes('x.com')) {
+				chrome.scripting.executeScript({
+					target: { tabId: tab.id },
+					func: () => {
+						window.alert(
+							'Please perform a search before you start scraping.',
+						);
+						if (window.location.href !== 'https://x.com/search-advanced') {
+							window.location.href = 'https://x.com/search-advanced';
+						}
+					},
+				});
+			} else {
+				chrome.tabs.create({
+					url: 'https://x.com/search-advanced',
+				});
+			}
+		} else {
+			port.postMessage({ action: 'scrape' });
+		}
+	} else {
+		console.log('Permission denied');
+	}
+});
+
 chrome.webRequest.onHeadersReceived.addListener(
 	function (details) {
 		if (port) {
@@ -10,7 +53,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 		}
 	},
 	{ urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'] },
-	['responseHeaders']
+	['responseHeaders'],
 );
 
 let scraping = false;
@@ -26,12 +69,12 @@ async function handlePort(p) {
 		if (port.sender) {
 			port.postMessage({ message: 'ping' });
 		} else {
-			console.error('No sender, clearing interval');
+			console.log('No sender, clearing interval');
 			clearInterval(pingInterval);
 		}
 	}, 10000);
 	port.onDisconnect.addListener((p) => {
-		console.error('Port disconnected', p);
+		console.log('Port disconnected', p);
 		tweets = [];
 		scraping = false;
 		chrome.storage.local.remove(['tweets']);
@@ -58,7 +101,7 @@ async function handlePort(p) {
 				{
 					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
 				},
-				['blocking']
+				['blocking'],
 			);
 		} else if (request.message === 'scrape') {
 			scraping = true;
@@ -69,7 +112,7 @@ async function handlePort(p) {
 				{
 					urls: ['*://x.com/i/api/graphql/*/SearchTimeline?*'],
 				},
-				['blocking']
+				['blocking'],
 			);
 			port.postMessage({
 				message: 'scrape_started',
@@ -177,7 +220,7 @@ async function scrapeListener(details) {
 				});
 				if (tweets.length >= demand.limit) {
 					chrome.webRequest.onBeforeRequest.removeListener(
-						scrapeListener
+						scrapeListener,
 					);
 					filter.disconnect();
 					port.postMessage({
@@ -186,7 +229,7 @@ async function scrapeListener(details) {
 				}
 			} else {
 				chrome.webRequest.onBeforeRequest.removeListener(
-					scrapeListener
+					scrapeListener,
 				);
 				filter.disconnect();
 				port.postMessage({
@@ -307,21 +350,44 @@ async function generateXlsx(posts, formatTable, port) {
 	} else {
 		worksheet.addRows(rows);
 	}
-	if (posts[0].hasOwnProperty('url')) {
-		const urlCol = worksheet.getColumn('url');
-		if (urlCol) {
-			urlCol.eachCell(function (cell) {
-				if (cell.value && cell.value.hyperlink) {
-					cell.style = {
-						font: {
-							color: { argb: 'ff0000ff' },
-							underline: true,
-						},
-					};
-				}
-			});
+	worksheet.columns.forEach((column) => {
+		let maxLength = 10;
+		column.eachCell({ includeEmpty: true }, (cell) => {
+			cell.alignment = {
+				wrapText: true,
+				vertical: 'top',
+				shrinkToFit: true,
+			};
+			if (cell.value && cell.value.hyperlink) {
+				cell.style = {
+					font: {
+						size: 12,
+						color: { argb: 'ff0000ff' },
+						underline: true,
+					},
+				};
+			} else {
+				cell.font = { size: 12 };
+			}
+			let cellValue = cell.value.text || cell.value;
+			if (cellValue instanceof Date) {
+				cellValue = cellValue.toISOString();
+			}
+			let cellLength = cellValue ? cellValue.toString().length : 10;
+			if (cellLength > maxLength) {
+				maxLength = cellLength;
+			}
+		});
+		if (maxLength >= 150) {
+			maxLength = maxLength / 2;
 		}
-	}
+		column.width = maxLength;
+	});
+	worksheet.getRow(1).font = {
+		bold: true,
+		size: 12,
+		color: { argb: 'FFFFFFFF' },
+	};
 	const buffer = await workbook.xlsx.writeBuffer();
 	const binaryBlob = btoa(String.fromCharCode(...new Uint8Array(buffer)));
 	const url = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${binaryBlob}`;

@@ -87,8 +87,13 @@ input.x-scraper[type='checkbox'] {
 }
 
 .x-scraper#title-div {
-	margin-bottom: 5%;
+	margin-bottom: 1rem;
 	font-size: x-large;
+}
+
+.x-scraper#version-div {
+	font-size: small;
+	font-weight: normal;
 }
 
 .x-scraper#scrape-ui-container {

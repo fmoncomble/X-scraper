@@ -47,6 +47,10 @@ port.onMessage.addListener((message) => {
 	if (message.message === 'ping') {
 		port.postMessage({ message: 'pong' });
 	}
+	if (message.action === 'scrape') {
+		launchUI();
+		// sendResponse({ success: true });
+	}
 });
 port.onDisconnect.addListener((p) => {
 	console.error('Port disconnected', p);
@@ -62,7 +66,7 @@ async function launchUI() {
 	}
 	if (!tweets || !tweets.length) {
 		window.alert(
-			'Failed to scrape first tweets. Reload the page and try again.'
+			'Failed to scrape first tweets. Reload the page and try again.',
 		);
 		window.location.reload();
 		return;
@@ -91,6 +95,8 @@ async function launchUI() {
 	dialog.showModal();
 
 	const modal = dialog.querySelector('div#modal');
+	const versionDiv = dialog.querySelector('div#version-div');
+	versionDiv.textContent = `v${chrome.runtime.getManifest().version}`;
 	const closeButton = dialog.querySelector('span#close-button');
 	const rateLimitNotice = dialog.querySelector('div#rate-limit-notice');
 	const maxTweetsInput = dialog.querySelector('input#max-tweets-input');
@@ -188,7 +194,7 @@ async function launchUI() {
 			mode = 'rateLimit';
 			if (maxTweets === Infinity) {
 				message = `Given X's rate limit, scrolling will start at a rate of 20 tweets every ${Math.ceil(
-					timeToReset / rateLimitRemaining / 1000
+					timeToReset / rateLimitRemaining / 1000,
 				)} seconds. Do you want to proceed?`;
 			} else if (maxTweets > rateLimitRemaining * 20) {
 				let timeInSeconds = (maxTweets / 20) * 18;
@@ -277,7 +283,7 @@ async function launchUI() {
 			iteration = 0;
 			if (!tweets || !tweets.length) {
 				window.alert(
-					'Failed to scrape first tweets. Reload the page and try again.'
+					'Failed to scrape first tweets. Reload the page and try again.',
 				);
 				window.location.reload();
 				return;
@@ -320,7 +326,7 @@ async function launchUI() {
 						port.postMessage({ message: 'stop_scrape' });
 						port.onMessage.removeListener(onMessage);
 						endScrape(
-							`Scrape stopped due to HTTP status ${statusCode}.`
+							`Scrape stopped due to HTTP status ${statusCode}.`,
 						);
 					}
 				}
@@ -331,7 +337,7 @@ async function launchUI() {
 				if (message.message === 'scrape_started') {
 					processContainer.textContent = `Scraped ${tweets.length} tweet(s), scrolling...`;
 					await new Promise((resolve) =>
-						setTimeout(resolve, waitTime)
+						setTimeout(resolve, waitTime),
 					);
 					let mut = await scrollToNext();
 					if (!mut) {
@@ -365,7 +371,7 @@ async function launchUI() {
 						for (let i = scrollDelay / 1000; i > 0; i--) {
 							if (!abort && !stopped) {
 								await new Promise((resolve) =>
-									setTimeout(resolve, 1000)
+									setTimeout(resolve, 1000),
 								);
 								processContainer.textContent = `Scraped ${tweets.length} tweet(s), now waiting ${i}...`;
 							} else {
@@ -389,7 +395,7 @@ async function launchUI() {
 					} else {
 						processContainer.textContent = `Scraped ${tweets.length} tweet(s), scrolling...`;
 						await new Promise((resolve) =>
-							setTimeout(resolve, waitTime)
+							setTimeout(resolve, waitTime),
 						);
 						let mut = await scrollToNext();
 						if (!mut) {
@@ -410,7 +416,7 @@ async function launchUI() {
 					}
 					port.onMessage.removeListener(onMessage);
 					endScrape(
-						'Received limit_reached or scraped_data from background.'
+						'Received limit_reached or scraped_data from background.',
 					);
 					return;
 				} else if (message.message === 'scrape_stopped') {
@@ -443,7 +449,7 @@ async function launchUI() {
 				try {
 					window.scrollTo(
 						0,
-						document.documentElement.scrollHeight * 2
+						document.documentElement.scrollHeight * 2,
 					);
 					let mut = await observeMutations(iteration);
 					i++;
@@ -491,7 +497,7 @@ async function launchUI() {
 	async function showOptions(statuses) {
 		try {
 			Array.from(
-				dlDialog.querySelectorAll('input[type="checkbox"]')
+				dlDialog.querySelectorAll('input[type="checkbox"]'),
 			).forEach((cb) => {
 				cb.checked = false;
 			});
@@ -500,7 +506,7 @@ async function launchUI() {
 			container.textContent = '';
 			generateListTree(keyTree, container);
 			const checkboxes = dlDialog.querySelectorAll(
-				'input[type="checkbox"].data-item'
+				'input[type="checkbox"].data-item',
 			);
 			checkboxes.forEach((checkbox) => {
 				updateParentCheckboxes(checkbox);
@@ -570,7 +576,7 @@ async function launchUI() {
 					const label = document.createElement('label');
 					label.htmlFor = key;
 					label.appendChild(
-						document.createTextNode(key.split('.').pop())
+						document.createTextNode(key.split('.').pop()),
 					);
 
 					li.appendChild(checkbox);
@@ -605,13 +611,13 @@ async function launchUI() {
 								arrow.textContent = '[less]';
 							} else {
 								const nestedContainers = Array.from(
-									li.querySelectorAll('div.nested-container')
+									li.querySelectorAll('div.nested-container'),
 								);
 								nestedContainers.forEach((container) => {
 									container.style.height = '0px';
 								});
 								const arrows = Array.from(
-									li.querySelectorAll('span.arrow')
+									li.querySelectorAll('span.arrow'),
 								);
 								arrows.forEach((a) => {
 									a.textContent = '[more]';
@@ -624,7 +630,7 @@ async function launchUI() {
 						checkbox.addEventListener('change', function () {
 							const childCheckboxes =
 								nestedContainer.querySelectorAll(
-									'input[type="checkbox"]'
+									'input[type="checkbox"]',
 								);
 							childCheckboxes.forEach((childCheckbox) => {
 								childCheckbox.checked = checkbox.checked;
@@ -646,7 +652,7 @@ async function launchUI() {
 				}
 			}
 			Array.from(
-				container.querySelectorAll("input[type='checkbox']")
+				container.querySelectorAll("input[type='checkbox']"),
 			).forEach((checkbox) => {
 				if (checkbox.checked) {
 					updateParentCheckboxes(checkbox);
@@ -660,20 +666,20 @@ async function launchUI() {
 		const parentLi = checkbox.closest('li').parentElement.closest('li');
 		if (parentLi) {
 			const parentCheckbox = parentLi.querySelector(
-				'input[type="checkbox"]'
+				'input[type="checkbox"]',
 			);
 			const parentContainer = parentLi.querySelector(
-				'div.nested-container'
+				'div.nested-container',
 			);
 			const arrow = parentLi.querySelector('span.arrow');
 			const childCheckboxes = parentContainer.querySelectorAll(
-				'ul >li > input[type="checkbox"]'
+				'ul >li > input[type="checkbox"]',
 			);
 			const allChecked = Array.from(childCheckboxes).every(
-				(child) => child.checked
+				(child) => child.checked,
 			);
 			const someChecked = Array.from(childCheckboxes).some(
-				(child) => child.checked
+				(child) => child.checked,
 			);
 
 			if (someChecked || allChecked) {
@@ -693,14 +699,14 @@ async function launchUI() {
 		fileFormat = formatSelect.value;
 		if (fileFormat === 'xlsx') {
 			const tableFormat = dlDialog.querySelector(
-				'label[for="table-checkbox"]'
+				'label[for="table-checkbox"]',
 			);
 			const tableCheckbox = tableFormat.querySelector('input');
 			tableCheckbox.checked = true;
 			tableFormat.style.display = 'block';
 		} else {
 			const tableFormat = document.querySelector(
-				'label[for="table-checkbox"]'
+				'label[for="table-checkbox"]',
 			);
 			if (tableFormat) {
 				tableFormat.remove();
@@ -708,7 +714,7 @@ async function launchUI() {
 		}
 		if (fileFormat === 'txt') {
 			const checkboxes = dlDialog.querySelectorAll(
-				'input[type="checkbox"].data-item'
+				'input[type="checkbox"].data-item',
 			);
 			checkboxes.forEach((checkbox) => {
 				if (checkbox.id !== 'full_text') {
@@ -722,7 +728,7 @@ async function launchUI() {
 	// Listen to anonymize checkbox
 	anonymizeCheckbox.onchange = () => {
 		const authorHandleCheckbox = document.getElementById(
-			'user.core.screen_name'
+			'user.core.screen_name',
 		);
 		if (anonymizeCheckbox.checked) {
 			authorHandleCheckbox.checked = true;
@@ -777,7 +783,7 @@ async function launchUI() {
 			}
 			posts = [];
 			const checkboxes = dlDialog.querySelectorAll(
-				'input[type="checkbox"].data-item'
+				'input[type="checkbox"].data-item',
 			);
 			let checkedCheckboxes = Array.from(checkboxes)
 				.filter((checkbox) => checkbox.checked)
@@ -886,7 +892,7 @@ async function launchUI() {
 				for (l of links) {
 					const newLink = l.replace(
 						/(.+)/,
-						`<ref target="$1">$1</ref>`
+						`<ref target="$1">$1</ref>`,
 					);
 					text = text.replace(l, newLink);
 				}
@@ -1133,9 +1139,9 @@ async function launchUI() {
 	}
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-	if (message.action === 'scrape') {
-		launchUI();
-		sendResponse({ success: true });
-	}
-});
+// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+// 	if (message.action === 'scrape') {
+// 		launchUI();
+// 		sendResponse({ success: true });
+// 	}
+// });

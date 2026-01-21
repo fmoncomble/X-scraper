@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "𝕏-Scraper",
-	"version": "0.7.5",
+	"version": "0.7.6",
 	"description": "A browser extension to scrape 𝕏/Twitter search results",
 	"homepage_url": "https://fmoncomble.github.io/X-scraper/",
 	"permissions": [
@@ -10,7 +10,8 @@
 		"webRequest",
 		"webRequestBlocking",
 		"webRequestFilterResponse",
-		"storage"
+		"storage",
+		"scripting"
 	],
 	"host_permissions": ["*://x.com/*"],
 	"content_scripts": [
@@ -23,7 +24,7 @@
 	"web_accessible_resources": [
 		{
 			"resources": ["scrape_dialog.html"],
-			"matches": ["*://twitter.com/*", "*://x.com/*"]
+			"matches": ["*://x.com/*"]
 		}
 	],
 	"background": {
@@ -35,7 +36,6 @@
 		"96": "icons/icon-96.png"
 	},
 	"action": {
-		"default_popup": "popup.html",
 		"default_icon": "icons/icon-32.png"
 	},
 	"browser_specific_settings": {
